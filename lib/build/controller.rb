@@ -29,7 +29,7 @@ require 'process/group'
 require 'system'
 
 module Build
-	class Node < Graph::Node
+	class RuleNode < Graph::Node
 		def initialize(rule, arguments, &block)
 			@arguments = arguments
 			@rule = rule
@@ -62,12 +62,12 @@ module Build
 		end
 	end
 	
-	class Top < Graph::Node
+	class TargetNode < Graph::Node
 		def initialize(task_class, &update)
 			@update = update
 			@task_class = task_class
 			
-			super(Paths::NONE, :inherit, @update)
+			super(Files::Paths::NONE, :inherit, @update)
 		end
 		
 		attr :task_class
@@ -82,7 +82,7 @@ module Build
 	end
 	
 	# This task class serves as the base class for the environment specific task classes genearted when adding targets.
-	class Task < Process::Task
+	class Task < Graph::Task
 		def initialize(walker, node, group)
 			super(walker, node)
 			
@@ -117,7 +117,7 @@ module Build
 		end
 		
 		def invoke_rule(rule, arguments, &block)
-			invoke Node.new(rule, arguments, &block)
+			invoke RuleNode.new(rule, arguments, &block)
 		end
 	end
 	
@@ -125,23 +125,24 @@ module Build
 		def initialize
 			@module = Module.new
 			
-			@top = []
+			# Top level nodes:
+			@nodes = []
 			
 			yield self
 			
-			@top.freeze
+			@nodes.freeze
 		end
 		
-		attr :top
+		attr :nodes
 		attr :visualisation
 		
-		def add_target(target, environment, &block)
+		def add_target(target, environment)
 			task_class = Rulebook.for(environment).with(Task, environment: environment, target: target)
 			
 			# Not sure if this is a good idea - makes debugging slightly easier.
 			Object.const_set("TaskClassFor#{Name.from_target(target.name).identifier}_#{self.object_id}", task_class)
 			
-			@top << Top.new(self, task_class, &target.build)
+			@nodes << TargetNode.new(task_class, &target.build)
 		end
 		
 		def update!
