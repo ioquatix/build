@@ -51,7 +51,7 @@ module Build
 					rule = rules.find{|rule| rule.applicable? arguments }
 					
 					if rule
-						update(rule, arguments, &block)
+						invoke_rule(rule, arguments, &block)
 					else
 						raise NoApplicableRule.new(key, arguments)
 					end
@@ -61,7 +61,7 @@ module Build
 			# Define methods for all rules, e.g. task_class#compile_cpp
 			@rules.each do |key, rule|
 				task_class.send(:define_method, rule.full_name) do |arguments, &block|
-					update(rule, arguments, &block)
+					invoke_rule(rule, arguments, &block)
 				end
 			end
 			
@@ -81,6 +81,8 @@ module Build
 				object = define.klass.new(*name.split('.', 2))
 				
 				object.instance_eval(&define.block)
+				
+				object.freeze
 				
 				rulebook << object
 			end

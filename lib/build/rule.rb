@@ -36,6 +36,14 @@ module Build
 			
 			attr :options
 			
+			def input?
+				@direction == :input
+			end
+			
+			def output?
+				@direction == :output
+			end
+			
 			def dynamic?
 				@dynamic != nil
 			end
@@ -95,6 +103,8 @@ module Build
 		# compile.cpp
 		attr :name
 		
+		attr :parameters
+		
 		# compile
 		attr :process_name
 		
@@ -104,17 +114,23 @@ module Build
 		attr :primary_output
 		
 		def input(name, options = {}, &block)
-			@parameters << Parameter.new(:input, name, options, &block)
+			self << Parameter.new(:input, name, options, &block)
 		end
 		
 		def parameter(name, options = {}, &block)
-			@parameters << Parameter.new(:argument, name, options, &block)
+			self << Parameter.new(:argument, name, options, &block)
 		end
 		
 		def output(name, options = {}, &block)
-			@parameters << Parameter.new(:output, name, options, &block)
+			self << Parameter.new(:output, name, options, &block)
+		end
+		
+		def << parameter
+			@parameters << parameter
 			
-			@primary_output ||= @parameters.last
+			if parameter.output?
+				@primary_output ||= parameter
+			end
 		end
 		
 		# Check if this rule can process these parameters
@@ -170,6 +186,10 @@ module Build
 			if @primary_output
 				arguments[@primary_output.name]
 			end
+		end
+		
+		def ==(other)
+			other.kind_of?(self.class) and @name == other.name and @parameters == other.parameters
 		end
 		
 		def to_s
