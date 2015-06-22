@@ -22,11 +22,8 @@ require_relative 'rulebook'
 
 require 'build/files'
 require 'build/graph'
-require 'build/makefile'
 
-require 'graphviz'
 require 'process/group'
-require 'system'
 
 module Build
 	class RuleNode < Graph::Node
@@ -113,7 +110,7 @@ module Build
 		end
 		
 		def update
-			@node.evaluate(self)
+			@node.apply!(self)
 		end
 		
 		def invoke_rule(rule, arguments, &block)
@@ -131,6 +128,20 @@ module Build
 			yield self
 			
 			@nodes.freeze
+			
+			@group = Process::Group.new
+			
+			# The task class is captured as we traverse all the top level targets:
+			@task_class = nil
+			
+			@walker = Graph::Walker.new do |walker, node|
+				# Instantiate the task class here:
+				task = @task_class.new(walker, node, @group)
+				
+				task.visit do
+					task.update
+				end
+			end
 		end
 		
 		attr :nodes
@@ -145,35 +156,19 @@ module Build
 			@nodes << TargetNode.new(task_class, &target.build)
 		end
 		
-		def update!
-			group = Process::Group.new
-			
-			# The task class is captured as we traverse all the top level targets:
-			task_class = nil
-			
-			walker = Walker.new do |walker, node|
-				# Instantiate the task class here:
-				task = task_class.new(walker, node, group)
-				
-				task.visit do
-					task.update
+		def update
+			@walker.run do
+				@nodes.each do |node|
+					# Update the task class here:
+					@task_class = node.task_class
+					
+					@walker.call(node)
 				end
-			end
-			
-			@top.each do |node|
-				# Update the task class here:
-				task_class = node.task_class
 				
-				walker.call(node)
+				@group.wait
+				
+				yield @walker
 			end
-			
-			group.wait
-			
-			if ENV['BUILD_GRAPH_PDF']
-				generate_graph_visualisation(walker)
-			end
-			
-			return walker
 		end
 		
 		def genreate_graph_visualisation(walker)

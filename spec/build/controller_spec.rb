@@ -1,4 +1,4 @@
-# Copyright, 2012, by Samuel G. D. Williams. <http://www.codeotaku.com>
+# Copyright, 2015, by Samuel G. D. Williams. <http://www.codeotaku.com>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -40,6 +40,14 @@ module Build::ControllerSpec
 	describe Build::Controller do
 		it "should execute the build graph" do
 			environment = Build::Environment.new do
+				define Build::Rule, "touch.file" do
+					output :destination
+					
+					apply do |parameters|
+						fs.touch parameters[:destination]
+					end
+				end
+				
 				define Build::Rule, "copy.file" do
 					input :source
 					output :destination
@@ -52,7 +60,12 @@ module Build::ControllerSpec
 			
 			target = Target.new('copy')
 			target.build do
-				copy source: 'foo', destination: 'bar'
+				foo_path = Build::Files::Path['foo']
+				bar_path = Build::Files::Path['bar']
+				
+				touch destination: foo_path
+				
+				copy source: foo_path, destination: bar_path
 			end
 			
 			controller = Build::Controller.new do |controller|
@@ -60,6 +73,12 @@ module Build::ControllerSpec
 			end
 			
 			expect(controller.nodes.size).to be 1
+			
+			controller.update do
+				break
+			end
+			
+			expect(File).to be_exist('foo')
 		end
 	end
 end
