@@ -79,6 +79,7 @@ module Build::ControllerSpec
 			end
 			
 			expect(File).to be_exist('foo')
+			expect(File).to be_exist('bar')
 		end
 	end
 end
