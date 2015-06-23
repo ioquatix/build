@@ -74,12 +74,12 @@ module Build::ControllerSpec
 			
 			expect(controller.nodes.size).to be 1
 			
-			controller.update do
-				break
-			end
+			controller.update
 			
 			expect(File).to be_exist('foo')
 			expect(File).to be_exist('bar')
+			
+			FileUtils.rm ['foo', 'bar']
 		end
 	end
 end

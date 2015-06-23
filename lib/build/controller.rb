@@ -105,7 +105,7 @@ module Build
 			if wet?
 				FileUtils::Verbose
 			else
-				FileUtils::Verbose::Dry
+				FileUtils::DryRun
 			end
 		end
 		
@@ -157,45 +157,22 @@ module Build
 		end
 		
 		def update
-			@walker.run do
-				@nodes.each do |node|
-					# Update the task class here:
-					@task_class = node.task_class
-					
-					@walker.call(node)
-				end
+			@nodes.each do |node|
+				# Update the task class here:
+				@task_class = node.task_class
 				
-				@group.wait
-				
-				yield @walker
+				@walker.call(node)
 			end
+			
+			@group.wait
+			
+			yield @walker if block_given?
 		end
 		
-		def genreate_graph_visualisation(walker)
-			viz = Graphviz::Graph.new('G', rankdir: "LR")
-			
-			walker.tasks.each do |node, task|
-				input_nodes = []
-				output_nodes = []
-				
-				task.inputs.each do |path|
-					input_nodes << viz.add_node(path.basename)
-				end
-				
-				task.outputs.each do |path|
-					output_nodes << viz.add_node(path.basename)
-				end
-				
-				if output_nodes.size == 1
-					input_nodes.each do |input_node|
-						edge = input_node.connect(output_nodes.first)
-						edge.attributes[:label] = node.title
-					end
-				end
+		def run(&block)
+			@walker.run do
+				self.update(&block)
 			end
-
-			Graphviz::output(viz, path: ENV['BUILD_GRAPH_PDF']) rescue nil
-			#`dot -Tpdf graph.dot > graph.pdf && open graph.pdf`
 		end
 	end
 end
