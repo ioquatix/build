@@ -114,7 +114,12 @@ module Build
 		end
 		
 		def invoke_rule(rule, arguments, &block)
-			invoke RuleNode.new(rule, arguments, &block)
+			arguments = rule.normalize(arguments, self)
+			
+			node = RuleNode.new(rule, arguments, &block)
+			task = invoke(node)
+			
+			return rule.result(arguments)
 		end
 	end
 	
