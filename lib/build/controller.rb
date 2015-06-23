@@ -101,6 +101,8 @@ module Build
 			end
 		end
 		
+		alias run! run
+		
 		def fs
 			if wet?
 				FileUtils::Verbose
