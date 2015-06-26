@@ -105,9 +105,11 @@ module Build
 		
 		def fs
 			if wet?
+				# Defaults to :verbose for all operations:
 				FileUtils::Verbose
 			else
-				FileUtils::DryRun
+				# Defaults to :noop for all operations:
+				FileUtils::NoWrite
 			end
 		end
 		
