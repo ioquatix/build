@@ -40,7 +40,7 @@ module Build::ControllerSpec
 	describe Build::Controller do
 		it "should execute the build graph" do
 			environment = Build::Environment.new do
-				define Build::Rule, "touch.file" do
+				define Build::Rule, "make.file" do
 					output :destination
 					
 					apply do |parameters|
@@ -63,7 +63,7 @@ module Build::ControllerSpec
 				foo_path = Build::Files::Path['foo']
 				bar_path = Build::Files::Path['bar']
 				
-				touch destination: foo_path
+				make destination: foo_path
 				
 				copy source: foo_path, destination: bar_path
 			end

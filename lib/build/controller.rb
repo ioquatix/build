@@ -25,6 +25,8 @@ require 'build/graph'
 
 require 'process/group'
 
+require_relative 'logger'
+
 module Build
 	class RuleNode < Graph::Node
 		def initialize(rule, arguments, &block)
@@ -80,10 +82,12 @@ module Build
 	
 	# This task class serves as the base class for the environment specific task classes genearted when adding targets.
 	class Task < Graph::Task
-		def initialize(walker, node, group)
+		def initialize(walker, node, group, logger: nil)
 			super(walker, node)
 			
 			@group = group
+			
+			@logger = logger || Logger.new($stderr)
 		end
 		
 		def wet?
@@ -92,7 +96,7 @@ module Build
 		
 		def run(*arguments)
 			if wet?
-				puts "\t[run] #{arguments.join(' ')}"
+				@logger.info('shell') {arguments}
 				status = @group.spawn(*arguments)
 				
 				if status != 0
@@ -103,14 +107,47 @@ module Build
 		
 		alias run! run
 		
-		def fs
-			if wet?
-				# Defaults to :verbose for all operations:
-				FileUtils::Verbose
-			else
-				# Defaults to :noop for all operations:
-				FileUtils::NoWrite
+		def touch(path)
+			return unless wet?
+			
+			@logger.info('shell'){ ['touch', path] }
+			FileUtils.touch(path)
+		end
+		
+		def cp(source_path, destination_path)
+			return unless wet?
+			
+			@logger.info('shell'){ ['cp', source_path, destination_path]}
+			FileUtils.copy(source_path, destination_path)
+		end
+		
+		def rm(path)
+			return unless wet?
+			
+			@logger.info('shell'){ ['rm', path] }
+			FileUtils.rm(path)
+		end
+		
+		def mkpath(path)
+			return unless wet?
+			
+			unless File.exist?(path)
+				@logger.info('shell'){ ['mkpath', path] }
+				
+				FileUtils.mkpath(path)
 			end
+		end
+		
+		def install(source_path, destination_path)
+			return unless wet?
+			
+			@logger.info('shell'){ ['install', source_path, destination_path]}
+			FileUtils.install(source_path, destination_path)
+		end
+		
+		# Legacy FileUtils access, replaced with direct function calls.
+		def fs
+			self
 		end
 		
 		def update
@@ -120,8 +157,12 @@ module Build
 		def invoke_rule(rule, arguments, &block)
 			arguments = rule.normalize(arguments, self)
 			
+			@logger.debug('invoke') {"-> #{rule}: #{arguments.inspect}"}
+			
 			node = RuleNode.new(rule, arguments, &block)
 			task = invoke(node)
+			
+			@logger.debug('invoke') {"<- #{rule}: #{rule.result(arguments)}"}
 			
 			return rule.result(arguments)
 		end
@@ -130,6 +171,10 @@ module Build
 	class Controller
 		def initialize
 			@module = Module.new
+			
+			@logger = Logger.new($stdout)
+			@logger.level = Logger::INFO
+			@logger.formatter = CompactFormatter.new
 			
 			# Top level nodes:
 			@nodes = []
@@ -145,7 +190,7 @@ module Build
 			
 			@walker = Graph::Walker.new do |walker, node|
 				# Instantiate the task class here:
-				task = @task_class.new(walker, node, @group)
+				task = @task_class.new(walker, node, @group, logger: @logger)
 				
 				task.visit do
 					task.update
