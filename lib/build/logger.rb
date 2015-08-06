@@ -41,18 +41,24 @@ module Build
 			end
 		end
 		
-		def format_command(args)
-			options = Hash === args.last ? args.pop : {}
-			args = args.flatten.collect &:to_s
+		def format_command(arguments)
+			if arguments.last.is_a? Hash
+				options = arguments.last
+				arguments = arguments[0...-1]
+			else
+				options = {}
+			end
 			
-			Rainbow(args.join(' ')).blue + chdir_string(options)
+			arguments = arguments.flatten.collect &:to_s
+			
+			Rainbow(arguments.join(' ')).blue + chdir_string(options)
 		end
 		
-		def call(severity, datetime, progname, msg)
-			if progname == 'shell' and Array === msg
-				"#{time_offset_string}: #{format_command(msg)}\n"
+		def call(severity, datetime, progname, message)
+			if progname == 'shell' and Array === message
+				"#{time_offset_string}: #{format_command(message)}\n"
 			else
-				"#{time_offset_string}: #{msg}\n"
+				"#{time_offset_string}: #{message}\n"
 			end
 		end
 	end
