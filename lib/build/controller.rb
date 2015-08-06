@@ -19,6 +19,7 @@
 # THE SOFTWARE.
 
 require_relative 'rulebook'
+require_relative 'name'
 
 require 'build/files'
 require 'build/graph'
@@ -82,6 +83,20 @@ module Build
 	
 	# This task class serves as the base class for the environment specific task classes genearted when adding targets.
 	class Task < Graph::Task
+		class CommandFailure < StandardError
+			def initialize(task, arguments, status)
+				@task = task
+				@arguments = arguments
+				@status = status
+				
+				super "#{@arguments.first} exited with status #{@status}"
+			end
+			
+			attr :task
+			attr :arguments
+			attr :status
+		end
+		
 		def initialize(walker, node, group, logger: nil)
 			super(walker, node)
 			
@@ -100,7 +115,7 @@ module Build
 				status = @group.spawn(*arguments)
 				
 				if status != 0
-					raise CommandError.new(status)
+					raise CommandFailure.new(self, arguments, status)
 				end
 			end
 		end

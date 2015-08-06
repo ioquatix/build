@@ -1,3 +1,5 @@
+#!/usr/bin/env rspec
+
 # Copyright, 2015, by Samuel G. D. Williams. <http://www.codeotaku.com>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -38,6 +40,30 @@ module Build::ControllerSpec
 	end
 	
 	describe Build::Controller do
+		it "should fail with exception" do
+			environment = Build::Environment.new do
+				define Build::Rule, "make.file" do
+					output :destination
+					
+					apply do |parameters|
+						run "exit -1"
+					end
+				end
+			end
+			
+			target = Target.new('fail')
+			target.build do
+				foo_path = Build::Files::Path['foo']
+				make destination: foo_path
+			end
+			
+			controller = Build::Controller.new do |controller|
+				controller.add_target(target, environment)
+			end
+			
+			expect{controller.update}.to raise_error(Build::Task::CommandFailure)
+		end
+		
 		it "should execute the build graph" do
 			environment = Build::Environment.new do
 				define Build::Rule, "make.file" do
