@@ -23,6 +23,7 @@ require_relative 'name'
 
 require 'build/files'
 require 'build/graph'
+require 'build/makefile'
 
 require 'process/group'
 
