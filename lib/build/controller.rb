@@ -109,7 +109,7 @@ module Build
 			@node.dirty?
 		end
 		
-		def run(*arguments)
+		def spawn(*arguments)
 			if wet?
 				@logger.info('shell') {arguments}
 				status = @group.spawn(*arguments)
@@ -120,7 +120,13 @@ module Build
 			end
 		end
 		
-		alias run! run
+		def shell_environment
+			@shell_environment ||= environment.flatten.export
+		end
+		
+		def run!(*arguments)
+			self.spawn(shell_environment, *arguments)
+		end
 		
 		def touch(path)
 			return unless wet?
