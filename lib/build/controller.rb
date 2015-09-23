@@ -145,8 +145,9 @@ module Build
 		def rm(path)
 			return unless wet?
 			
-			@logger.info('shell'){ ['rm', path] }
-			FileUtils.rm(path)
+			@logger.info('shell'){ ['rm -rf', path] }
+			
+			FileUtils.rm_rf(path)
 		end
 		
 		def mkpath(path)
