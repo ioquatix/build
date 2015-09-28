@@ -192,12 +192,13 @@ module Build
 	end
 	
 	class Controller
-		def initialize
+		def initialize(logger: nil)
 			@module = Module.new
 			
-			@logger = Logger.new($stdout)
-			@logger.level = Logger::INFO
-			@logger.formatter = CompactFormatter.new
+			@logger = logger || Logger.new($stdout).tap do |logger|
+				logger.level = Logger::INFO
+				logger.formatter = CompactFormatter.new
+			end
 			
 			# Top level nodes:
 			@nodes = []
