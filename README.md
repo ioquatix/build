@@ -18,7 +18,7 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install build-files
+    $ gem install build
 
 ## Usage
 
