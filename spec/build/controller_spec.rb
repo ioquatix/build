@@ -46,7 +46,7 @@ module Build::ControllerSpec
 					output :destination
 					
 					apply do |parameters|
-						run "exit -1"
+						run! "exit -1"
 					end
 				end
 			end
