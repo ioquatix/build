@@ -192,7 +192,7 @@ module Build
 	end
 	
 	class Controller
-		def initialize(logger: nil)
+		def initialize(logger: nil, limit: nil)
 			@module = Module.new
 			
 			@logger = logger || Logger.new($stdout).tap do |logger|
@@ -207,7 +207,7 @@ module Build
 			
 			@nodes.freeze
 			
-			@group = Process::Group.new
+			@group = Process::Group.new(limit: limit)
 			
 			# The task class is captured as we traverse all the top level targets:
 			@task_class = nil
