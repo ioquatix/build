@@ -147,7 +147,6 @@ module Build
 			return unless wet?
 			
 			@logger.info('shell'){ ['rm -rf', path] }
-			
 			FileUtils.rm_rf(path)
 		end
 		
