@@ -193,7 +193,7 @@ module Build
 		end
 		
 		def to_s
-			"<#{self.class.name} #{@name.dump}>"
+			"#<#{self.class} #{@name.dump}>"
 		end
 	end
 	
