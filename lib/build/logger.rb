@@ -49,7 +49,7 @@ module Build
 				options = {}
 			end
 			
-			arguments = arguments.flatten.collect &:to_s
+			arguments = arguments.flatten.collect(&:to_s)
 			
 			Rainbow(arguments.join(' ')).blue + chdir_string(options)
 		end
