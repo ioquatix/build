@@ -2,8 +2,8 @@
 
 Build is a ruby gem providing systems for building task driven build systems similar to make.
 
-[![Build Status](https://secure.travis-ci.org/ioquatix/build.png)](http://travis-ci.org/ioquatix/build)
-[![Code Climate](https://codeclimate.com/github/ioquatix/build.png)](https://codeclimate.com/github/ioquatix/build)
+[![Build Status](https://secure.travis-ci.org/ioquatix/build.svg)](http://travis-ci.org/ioquatix/build)
+[![Code Climate](https://codeclimate.com/github/ioquatix/build.svg)](https://codeclimate.com/github/ioquatix/build)
 [![Coverage Status](https://coveralls.io/repos/ioquatix/build/badge.svg)](https://coveralls.io/r/ioquatix/build)
 
 ## Installation
