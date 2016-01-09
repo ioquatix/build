@@ -23,8 +23,9 @@ require 'rainbow'
 
 module Build
 	class CompactFormatter
-		def initialize
+		def initialize(verbose: true)
 			@start = Time.now
+			@verbose = verbose
 		end
 		
 		def time_offset_string
@@ -55,11 +56,21 @@ module Build
 		end
 		
 		def call(severity, datetime, progname, message)
-			if progname == 'shell' and Array === message
-				"#{time_offset_string}: #{format_command(message)}\n"
-			else
-				"#{time_offset_string}: #{message}\n"
+			buffer = []
+			
+			if @verbose
+				buffer << time_offset_string << ": "
 			end
+			
+			if progname == 'shell' and Array === message
+				buffer << format_command(message)
+			else
+				buffer << message
+			end
+			
+			buffer << "\n"
+			
+			return buffer.join
 		end
 	end
 end
