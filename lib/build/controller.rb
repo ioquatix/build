@@ -46,8 +46,8 @@ module Build
 		attr :rule
 		attr :callback
 		
-		def title
-			@rule.title
+		def name
+			@rule.name
 		end
 		
 		def apply!(scope)
