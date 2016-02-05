@@ -64,17 +64,27 @@ module Build
 	end
 	
 	class TargetNode < Graph::Node
-		def initialize(task_class, &update)
-			@update = update
+		def initialize(task_class, target)
+			@target = target
 			@task_class = task_class
 			
-			super(Files::Paths::NONE, :inherit, @update)
+			# Wait here, for all dependent targets, to be done:
+			super(self.dependent_inputs, :inherit, target)
 		end
 		
 		attr :task_class
 		
+		def name
+			@task_class.name
+		end
+		
 		def apply!(scope)
-			scope.instance_exec(&@update)
+			scope.instance_exec(&@target.build)
+			
+			# Output here, I'm done with this target:
+			self.dependent_outputs.each do |output|
+				scope.touch output
+			end
 		end
 		
 		def inspect
@@ -225,18 +235,20 @@ module Build
 		attr :nodes
 		attr :walker
 		
+		# Add a build target to the controller.
 		def add_target(target, environment)
 			task_class = Rulebook.for(environment).with(Task, environment: environment, target: target)
 			
 			# Not sure if this is a good idea - makes debugging slightly easier.
 			Object.const_set("TaskClassFor#{Name.from_target(target.name).identifier}_#{self.object_id}", task_class)
 			
-			@nodes << TargetNode.new(task_class, &target.build)
+			# A target node will invoke the build callback on target.
+			@nodes << TargetNode.new(task_class, target)
 		end
 		
 		def update
 			@nodes.each do |node|
-				# Update the task class here:
+				# Each top-level TargetNode exposes it's own task class with specific environment state. We want to use this task class for all nodes, including RuleNodes. So, we capture it here so that it can be used in the Walker callback.
 				@task_class = node.task_class
 				
 				@walker.call(node)
@@ -247,6 +259,7 @@ module Build
 			yield @walker if block_given?
 		end
 		
+		# The entry point for running the walker over the build graph.
 		def run(&block)
 			@walker.run do
 				self.update(&block)
