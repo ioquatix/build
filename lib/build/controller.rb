@@ -211,8 +211,9 @@ module Build
 			# The task class is captured as we traverse all the top level targets:
 			@task_class = nil
 			
-			@walker = Graph::Walker.new do |walker, node|
+			@walker = Graph::Walker.new(logger: logger) do |walker, node|
 				# Instantiate the task class here:
+				# TODO: Don't use class state to track this. Perhaps walker can have some top level state which is passed in via @walker.call
 				task = @task_class.new(walker, node, @group, logger: @logger)
 				
 				task.visit do
@@ -222,7 +223,7 @@ module Build
 		end
 		
 		attr :nodes
-		attr :visualisation
+		attr :walker
 		
 		def add_target(target, environment)
 			task_class = Rulebook.for(environment).with(Task, environment: environment, target: target)
