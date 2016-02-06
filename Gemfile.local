@@ -1,0 +1,24 @@
+source 'https://rubygems.org'
+
+# Specify your gem's dependencies in build.gemspec
+gemspec
+
+group :development do
+	gem 'pry'
+	gem 'pry-coolline'
+	
+	gem 'build-environment', path: '../build-environment'
+	gem 'build-files', path: '../build-files'
+	gem 'build-graph', path: '../build-graph'
+	gem 'build-makefile', path: '../build-makefile'
+	
+	gem 'process-daemon', path: '../process-daemon'
+	gem 'process-group', path: '../process-group'
+	
+	gem 'graphviz', path: '../graphviz'
+end
+
+group :test do
+	gem 'simplecov'
+	gem 'coveralls', require: false
+end
