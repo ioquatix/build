@@ -189,12 +189,12 @@ module Build
 		def invoke_rule(rule, arguments, &block)
 			arguments = rule.normalize(arguments, self)
 			
-			@logger.debug('invoke') {"-> #{rule}: #{arguments.inspect}"}
+			@logger.debug('invoke') {"-> #{rule}(#{arguments.inspect})"}
 			
 			node = RuleNode.new(rule, arguments, &block)
 			task = invoke(node)
 			
-			@logger.debug('invoke') {"<- #{rule}: #{rule.result(arguments)}"}
+			@logger.debug('invoke') {"<- #{rule}(...) -> #{rule.result(arguments)}"}
 			
 			return rule.result(arguments)
 		end
@@ -231,6 +231,8 @@ module Build
 				end
 			end
 		end
+		
+		attr :logger
 		
 		attr :nodes
 		attr :walker

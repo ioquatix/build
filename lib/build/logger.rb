@@ -28,10 +28,10 @@ module Build
 			@verbose = verbose
 		end
 		
-		def time_offset_string
+		def time_offset_prefix
 			offset = Time.now - @start
 			
-			"T+#{offset.round(2).to_s.ljust(5)}"
+			"T+#{offset.round(2).to_s.ljust(5)} : "
 		end
 		
 		def chdir_string(options)
@@ -42,35 +42,55 @@ module Build
 			end
 		end
 		
-		def format_command(arguments)
-			if arguments.last.is_a? Hash
-				options = arguments.last
-				arguments = arguments[0...-1]
-			else
-				options = {}
-			end
+		def format_command(arguments, buffer)
+			arguments = arguments.dup
+			
+			environment = arguments.first.is_a?(Hash) ? arguments.shift : nil
+			options = arguments.last.is_a?(Hash) ? arguments.pop : nil
 			
 			arguments = arguments.flatten.collect(&:to_s)
 			
-			Rainbow(arguments.join(' ')).blue + chdir_string(options)
-		end
-		
-		def call(severity, datetime, progname, message)
-			buffer = []
+			buffer << Rainbow(arguments.join(' ')).bright.blue
 			
-			if @verbose
-				buffer << time_offset_string << ": "
-			end
-			
-			if progname == 'shell' and Array === message
-				buffer << format_command(message)
-			else
-				buffer << message
+			if options
+				buffer << chdir_string(options)
 			end
 			
 			buffer << "\n"
 			
-			return buffer.join
+			# if environment
+			# 	environment.each do |key,value|
+			# 		buffer << "\texport #{key}=#{value.dump}\n"
+			# 	end
+			# end
+		end
+		
+		def format_exception(exception, buffer)
+			buffer << Rainbow("#{exception.class}: #{exception}").bright.red << "\n"
+			exception.backtrace.each do |line|
+				buffer << "\t" << Rainbow(line).red << "\n"
+			end
+		end
+		
+		def call(severity, datetime, progname, message)
+			buffer = []
+			prefix = ""
+			
+			if @verbose
+				buffer << time_offset_prefix
+				prefix = " " * (buffer.last.size - 2) + "… " 
+			end
+			
+			if progname == 'shell' and message.kind_of? Array
+				format_command(message, buffer)
+			elsif message.kind_of? Exception
+				format_exception(message, buffer)
+			else
+				buffer << message << "\n"
+			end
+			
+			# This fancy regex indents lines correctly depending on the prefix:
+			return buffer.join.gsub(/\n(?!$)/, "\n#{prefix}")
 		end
 	end
 end
