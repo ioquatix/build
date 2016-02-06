@@ -30,8 +30,14 @@ module Build
 		
 		def time_offset_prefix
 			offset = Time.now - @start
+			minutes = (offset/60).floor
+			seconds = (offset - (minutes*60))
 			
-			"T+#{offset.round(2).to_s.ljust(5)}: "
+			if minutes > 0
+				"#{minutes}m#{seconds.floor}s"
+			else
+				"#{seconds.round(2)}s"
+			end.rjust(6)
 		end
 		
 		def chdir_string(options)
@@ -77,8 +83,9 @@ module Build
 			prefix = ""
 			
 			if @verbose
-				buffer << time_offset_prefix
-				prefix = " " * (buffer.last.size - 2) + "| " 
+				prefix = time_offset_prefix
+				buffer << Rainbow(prefix).cyan + ": "
+				prefix = " " * (prefix.size) + "| " 
 			end
 			
 			if progname == 'shell' and message.kind_of? Array
