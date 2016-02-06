@@ -78,7 +78,7 @@ module Build
 			
 			if @verbose
 				buffer << time_offset_prefix
-				prefix = " " * (buffer.last.size - 2) + "… " 
+				prefix = " " * (buffer.last.size - 2) + "| " 
 			end
 			
 			if progname == 'shell' and message.kind_of? Array
