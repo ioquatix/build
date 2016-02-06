@@ -31,7 +31,7 @@ module Build
 		def time_offset_prefix
 			offset = Time.now - @start
 			
-			"T+#{offset.round(2).to_s.ljust(5)} : "
+			"T+#{offset.round(2).to_s.ljust(5)}: "
 		end
 		
 		def chdir_string(options)
