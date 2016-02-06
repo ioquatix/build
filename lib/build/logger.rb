@@ -89,8 +89,12 @@ module Build
 				buffer << message << "\n"
 			end
 			
+			result = buffer.join
+			
 			# This fancy regex indents lines correctly depending on the prefix:
-			return buffer.join.gsub(/\n(?!$)/, "\n#{prefix}")
+			result.gsub!(/\n(?!$)/, "\n#{prefix}") unless prefix.empty?
+			
+			return result
 		end
 	end
 end
