@@ -39,8 +39,8 @@ module Build::ControllerSpec
 		end
 	end
 	
-	describe Build::Controller do
-		it "should fail with exception" do
+	RSpec.describe Build::Controller do
+		it "build graph should fail" do
 			environment = Build::Environment.new do
 				define Build::Rule, "make.file" do
 					output :destination
@@ -61,7 +61,11 @@ module Build::ControllerSpec
 				controller.add_target(target, environment)
 			end
 			
-			expect{controller.update}.to raise_error(Build::Task::CommandFailure)
+			controller.logger.level = Logger::DEBUG
+			
+			controller.update
+			
+			expect(controller.failed?).to be_truthy
 		end
 		
 		it "should execute the build graph" do

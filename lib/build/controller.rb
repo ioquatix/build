@@ -87,6 +87,14 @@ module Build
 			end
 		end
 		
+		def dependent_inputs
+			Files::List::NONE
+		end
+		
+		def dependent_outputs
+			Files::List::NONE
+		end
+		
 		def inspect
 			@task_class.name.inspect
 		end
@@ -94,13 +102,15 @@ module Build
 	
 	# This task class serves as the base class for the environment specific task classes genearted when adding targets.
 	class Task < Graph::Task
-		class CommandFailure < StandardError
+		class CommandFailure < Graph::TransientError
 			def initialize(task, arguments, status)
 				@task = task
 				@arguments = arguments
 				@status = status
 				
-				super "#{@arguments.first} exited with status #{@status}"
+				@command_name = arguments.find{|part| part.kind_of? String}
+				
+				super "#{@command_name.inspect} exited with status #{@status}"
 			end
 			
 			attr :task
@@ -209,11 +219,9 @@ module Build
 				logger.formatter = CompactFormatter.new
 			end
 			
-			# Top level nodes:
+			# Top level nodes, for sanity this is a static list.
 			@nodes = []
-			
 			yield self
-			
 			@nodes.freeze
 			
 			@group = Process::Group.new(limit: limit)
@@ -221,21 +229,25 @@ module Build
 			# The task class is captured as we traverse all the top level targets:
 			@task_class = nil
 			
-			@walker = Graph::Walker.new(logger: logger) do |walker, node|
-				# Instantiate the task class here:
-				# TODO: Don't use class state to track this. Perhaps walker can have some top level state which is passed in via @walker.call
-				task = @task_class.new(walker, node, @group, logger: @logger)
-				
-				task.visit do
-					task.update
-				end
-			end
+			@walker = Graph::Walker.new(logger: @logger, &self.method(:step))
 		end
 		
 		attr :logger
 		
 		attr :nodes
 		attr :walker
+		
+		private def step(walker, node, task_class:)
+			task = task_class.new(walker, node, @group, logger: @logger)
+			
+			task.visit do
+				task.update
+			end
+		end
+		
+		def failed?
+			@walker.failed?
+		end
 		
 		# Add a build target to the controller.
 		def add_target(target, environment)
@@ -249,14 +261,11 @@ module Build
 		end
 		
 		def update
-			@nodes.each do |node|
-				# Each top-level TargetNode exposes it's own task class with specific environment state. We want to use this task class for all nodes, including RuleNodes. So, we capture it here so that it can be used in the Walker callback.
-				@task_class = node.task_class
-				
-				@walker.call(node)
+			@group.wait do
+				@nodes.each do |node|
+					@walker.call(node, task_class: node.task_class)
+				end
 			end
-			
-			@group.wait
 			
 			yield @walker if block_given?
 		end
