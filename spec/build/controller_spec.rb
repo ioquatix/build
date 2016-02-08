@@ -20,7 +20,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require 'build/environment'
 require 'build/rulebook'
 require 'build/controller'
 
@@ -74,7 +73,7 @@ module Build::ControllerSpec
 					output :destination
 					
 					apply do |parameters|
-						fs.touch parameters[:destination]
+						touch parameters[:destination]
 					end
 				end
 				
@@ -83,7 +82,7 @@ module Build::ControllerSpec
 					output :destination
 					
 					apply do |parameters|
-						fs.cp parameters[:source], parameters[:destination]
+						cp parameters[:source], parameters[:destination]
 					end
 				end
 			end

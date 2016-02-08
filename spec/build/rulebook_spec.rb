@@ -30,7 +30,7 @@ module Build::RulebookSpec
 					output :destination
 					
 					apply do |parameters|
-						fs.cp parameters[:source], parameters[:destination]
+						cp parameters[:source], parameters[:destination]
 					end
 				end
 				
@@ -38,7 +38,7 @@ module Build::RulebookSpec
 					input :target
 					
 					apply do |parameters|
-						fs.rm parameters[:target]
+						rm parameters[:target]
 					end
 				end
 			end
