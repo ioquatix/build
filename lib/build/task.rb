@@ -30,9 +30,15 @@ module Build
 				@arguments = arguments
 				@status = status
 				
-				@command_name = arguments.find{|part| part.kind_of? String}
-				
-				super "#{@command_name.inspect} exited with status #{@status}"
+				super "#{File.basename(executable_name).inspect} exited with status #{@status.to_i}"
+			end
+			
+			def executable_name
+				if @arguments[0].kind_of? Hash
+					@arguments[1]
+				else
+					@arguments[0]
+				end
 			end
 			
 			attr :task
