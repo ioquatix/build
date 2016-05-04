@@ -48,13 +48,18 @@ module Build
 				@dynamic != nil
 			end
 			
+			# Do we have a default value for this parameter?
+			def default?
+				@options.key?(:default)
+			end
+			
 			def implicit?
 				dynamic? and @options[:implicit]
 			end
 			
 			# Optional parameters are those that are either defined as optional or implicit.
 			def optional?
-				@options[:optional] || implicit?
+				@options[:optional] || implicit? || default?
 			end
 			
 			def applicable? arguments
@@ -80,7 +85,7 @@ module Build
 					scope.instance_exec(arguments[@name], arguments, &@dynamic)
 				else
 					arguments[@name]
-				end
+				end || @options[:default]
 			end
 			
 			def inspect
