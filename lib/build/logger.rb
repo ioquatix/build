@@ -88,7 +88,7 @@ module Build
 				prefix = " " * (prefix.size) + "| " 
 			end
 			
-			if progname == 'shell' and message.kind_of? Array
+			if progname == :shell and message.kind_of? Array
 				format_command(message, buffer)
 			elsif message.kind_of? Exception
 				format_exception(message, buffer)
