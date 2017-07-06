@@ -23,9 +23,10 @@ require 'build/graph'
 
 module Build	
 	class TargetNode < Graph::Node
-		def initialize(task_class, target)
+		def initialize(task_class, target, arguments)
 			@target = target
 			@task_class = task_class
+			@arguments = arguments
 			
 			# Wait here, for all dependent targets, to be done:
 			super(Files::List::NONE, :inherit, target)
@@ -38,7 +39,7 @@ module Build
 		end
 		
 		def apply!(scope)
-			scope.instance_exec(&@target.build)
+			scope.instance_exec(*@arguments, &@target.build)
 		end
 		
 		def inspect
