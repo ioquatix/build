@@ -103,7 +103,6 @@ module Build
 			
 			unless File.exist?(path)
 				@logger.info(:shell) {['mkpath', path]}
-				
 				FileUtils.mkpath(path)
 			end
 		end
@@ -118,7 +117,7 @@ module Build
 		def write(path, data, mode = "w")
 			return unless wet?
 			
-			@logger.info(:file) {"write(#{path}, #{mode}, #{data.size}bytes)"}
+			@logger.info(:shell) {["write", path, "#{data.size}bytes"]}
 			File.open(path, mode) do |file|
 				file.write(data)
 			end
