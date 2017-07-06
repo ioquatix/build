@@ -21,34 +21,32 @@
 require 'build/environment'
 require 'build/rulebook'
 
-module Build::RulebookSpec
-	describe Build::Rulebook do
-		it "should generate a valid rulebook" do
-			environment = Build::Environment.new do
-				define Build::Rule, "copy.file" do
-					input :source
-					output :destination
-					
-					apply do |parameters|
-						cp parameters[:source], parameters[:destination]
-					end
-				end
+RSpec.describe Build::Rulebook do
+	it "should generate a valid rulebook" do
+		environment = Build::Environment.new do
+			define Build::Rule, "copy.file" do
+				input :source
+				output :destination
 				
-				define Build::Rule, "delete.file" do
-					input :target
-					
-					apply do |parameters|
-						rm parameters[:target]
-					end
+				apply do |parameters|
+					cp parameters[:source], parameters[:destination]
 				end
 			end
 			
-			rulebook = Build::Rulebook.for(environment)
-			
-			expect(rulebook.rules.size).to be 2
-			
-			expect(rulebook.rules).to be_include 'copy.file'
-			expect(rulebook.rules).to be_include 'delete.file'
+			define Build::Rule, "delete.file" do
+				input :target
+				
+				apply do |parameters|
+					rm parameters[:target]
+				end
+			end
 		end
+		
+		rulebook = Build::Rulebook.for(environment)
+		
+		expect(rulebook.rules.size).to be 2
+		
+		expect(rulebook.rules).to be_include 'copy.file'
+		expect(rulebook.rules).to be_include 'delete.file'
 	end
 end

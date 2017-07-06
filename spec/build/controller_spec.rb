@@ -23,92 +23,92 @@
 require 'build/rulebook'
 require 'build/controller'
 
-module Build::ControllerSpec
-	class Target
-		def initialize(name)
-			@name = name
-		end
-		
-		attr :name
-		
-		def build(&block)
-			@build = block if block_given?
+RSpec.describe Build::Controller do
+	let(:target_class) do
+		Class.new do
+			def initialize(name)
+				@name = name
+			end
 			
-			return @build
+			attr :name
+			
+			def build(&block)
+				@build = block if block_given?
+				
+				return @build
+			end
 		end
 	end
 	
-	RSpec.describe Build::Controller do
-		it "build graph should fail" do
-			environment = Build::Environment.new do
-				define Build::Rule, "make.file" do
-					output :destination
-					
-					apply do |parameters|
-						run! "exit -1"
-					end
+	it "build graph should fail" do
+		environment = Build::Environment.new do
+			define Build::Rule, "make.file" do
+				output :destination
+				
+				apply do |parameters|
+					run! "exit -1"
 				end
 			end
-			
-			target = Target.new('fail')
-			target.build do
-				foo_path = Build::Files::Path['foo']
-				make destination: foo_path
-			end
-			
-			controller = Build::Controller.new do |controller|
-				controller.add_target(target, environment)
-			end
-			
-			controller.logger.level = Logger::DEBUG
-			
-			controller.update
-			
-			expect(controller.failed?).to be_truthy
 		end
 		
-		it "should execute the build graph" do
-			environment = Build::Environment.new do
-				define Build::Rule, "make.file" do
-					output :destination
-					
-					apply do |parameters|
-						touch parameters[:destination]
-					end
-				end
-				
-				define Build::Rule, "copy.file" do
-					input :source
-					output :destination
-					
-					apply do |parameters|
-						cp parameters[:source], parameters[:destination]
-					end
-				end
-			end
-			
-			target = Target.new('copy')
-			target.build do
-				foo_path = Build::Files::Path['foo']
-				bar_path = Build::Files::Path['bar']
-				
-				make destination: foo_path
-				
-				copy source: foo_path, destination: bar_path
-			end
-			
-			controller = Build::Controller.new do |controller|
-				controller.add_target(target, environment)
-			end
-			
-			expect(controller.nodes.size).to be 1
-			
-			controller.update
-			
-			expect(File).to be_exist('foo')
-			expect(File).to be_exist('bar')
-			
-			FileUtils.rm ['foo', 'bar']
+		target = target_class.new('fail')
+		target.build do
+			foo_path = Build::Files::Path['foo']
+			make destination: foo_path
 		end
+		
+		controller = Build::Controller.new do |controller|
+			controller.add_target(target, environment)
+		end
+		
+		controller.logger.level = Logger::DEBUG
+		
+		controller.update
+		
+		expect(controller.failed?).to be_truthy
+	end
+	
+	it "should execute the build graph" do
+		environment = Build::Environment.new do
+			define Build::Rule, "make.file" do
+				output :destination
+				
+				apply do |parameters|
+					touch parameters[:destination]
+				end
+			end
+			
+			define Build::Rule, "copy.file" do
+				input :source
+				output :destination
+				
+				apply do |parameters|
+					cp parameters[:source], parameters[:destination]
+				end
+			end
+		end
+		
+		target = target_class.new('copy')
+		target.build do
+			foo_path = Build::Files::Path['foo']
+			bar_path = Build::Files::Path['bar']
+			
+			make destination: foo_path
+			
+			copy source: foo_path, destination: bar_path
+		end
+		
+		controller = Build::Controller.new do |controller|
+			controller.add_target(target, environment)
+		end
+		
+		expect(controller.nodes.size).to be 1
+		
+		controller.update
+		
+		expect(File).to be_exist('foo')
+		expect(File).to be_exist('bar')
+		
+		FileUtils.rm ['foo', 'bar']
 	end
 end

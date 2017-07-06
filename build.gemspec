@@ -17,13 +17,13 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = '>= 2.0'
 	
-	spec.add_dependency "build-graph", "~> 1.0.5"
-	spec.add_dependency "build-environment", "~> 1.1.3"
-	spec.add_dependency "build-makefile", "~> 1.0.0"
+	spec.add_dependency "build-graph", "~> 1.0"
+	spec.add_dependency "build-environment", "~> 1.1"
+	spec.add_dependency "build-makefile", "~> 1.0"
 	
 	spec.add_dependency "graphviz"
 	
 	spec.add_development_dependency "bundler", "~> 1.3"
-	spec.add_development_dependency "rspec", "~> 3.4.0"
+	spec.add_development_dependency "rspec", "~> 3.6"
 	spec.add_development_dependency "rake"
 end
