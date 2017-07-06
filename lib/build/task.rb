@@ -80,21 +80,21 @@ module Build
 		def touch(path)
 			return unless wet?
 			
-			@logger.info(:shell){ ['touch', path] }
+			@logger.info(:shell) {['touch', path]}
 			FileUtils.touch(path)
 		end
 		
 		def cp(source_path, destination_path)
 			return unless wet?
 			
-			@logger.info(:shell){ ['cp', source_path, destination_path]}
+			@logger.info(:shell) {['cp', source_path, destination_path]}
 			FileUtils.copy(source_path, destination_path)
 		end
 		
 		def rm(path)
 			return unless wet?
 			
-			@logger.info(:shell){ ['rm -rf', path] }
+			@logger.info(:shell) {['rm -rf', path]}
 			FileUtils.rm_rf(path)
 		end
 		
@@ -102,7 +102,7 @@ module Build
 			return unless wet?
 			
 			unless File.exist?(path)
-				@logger.info(:shell){ ['mkpath', path] }
+				@logger.info(:shell) {['mkpath', path]}
 				
 				FileUtils.mkpath(path)
 			end
@@ -111,11 +111,20 @@ module Build
 		def install(source_path, destination_path)
 			return unless wet?
 			
-			@logger.info(:shell){ ['install', source_path, destination_path]}
+			@logger.info(:shell) {['install', source_path, destination_path]}
 			FileUtils.install(source_path, destination_path)
 		end
 		
-		# Legacy FileUtils access, replaced with direct function calls.
+		def write(path, data, mode = "w")
+			return unless wet?
+			
+			@logger.info(:file) {"write(#{path}, #{mode}, #{data.size}bytes)"}
+			File.open(path, mode) do |file|
+				file.write(data)
+			end
+		end
+		
+		# @deprecated Please use {#self} instead.
 		def fs
 			self
 		end
