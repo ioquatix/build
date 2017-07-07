@@ -103,6 +103,7 @@ module Build
 			@apply = nil
 			
 			@parameters = []
+			@primary_output = nil
 		end
 		
 		# compile.cpp
