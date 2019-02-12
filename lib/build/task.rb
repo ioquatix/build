@@ -132,8 +132,9 @@ module Build
 			
 			@logger&.debug(:invoke) {"-> #{rule}(#{arguments.inspect})"}
 			
-			node = RuleNode.new(rule, arguments, &block)
-			task = invoke(node)
+			invoke(
+				RuleNode.new(rule, arguments, &block)
+			)
 			
 			@logger&.debug(:invoke) {"<- #{rule}(...) -> #{rule.result(arguments)}"}
 			
