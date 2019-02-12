@@ -72,19 +72,6 @@ module Build
 			@walker.failed?
 		end
 		
-		# # Add a build target to the controller.
-		# def add_target(target, environment, arguments = [])
-		# 	task_class = Rulebook.for(environment).with(Task, environment: environment, target: target)
-		# 
-		# 	# Not sure if this is a good idea - makes debugging slightly easier.
-		# 	Object.const_set("TaskClassFor#{Name.from_target(target.name).identifier}_#{task_class.object_id}", task_class)
-		# 
-		# 	# A target node will invoke the build callback on target.
-		# 	@nodes << TargetNode.new(task_class, target, arguments)
-		# 
-		# 	return @nodes.last
-		# end
-		
 		# Add a build environment to the controller.
 		def add_environment(environment)
 			@nodes << EnvironmentNode.new(environment)
