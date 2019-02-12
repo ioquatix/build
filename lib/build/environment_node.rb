@@ -21,33 +21,29 @@
 require 'build/files'
 require 'build/graph'
 
-module Build	
-	class TargetNode < Graph::Node
-		def initialize(task_class, target, arguments)
-			@target = target
-			@task_class = task_class
-			@arguments = arguments
+module Build
+	class EnvironmentNode < Graph::Node
+		def initialize(environment, process = environment)
+			@environment = environment
 			
 			# Wait here, for all dependent targets, to be done:
-			super(Files::List::NONE, :inherit, target)
+			super(Files::List::NONE, :inherit, process)
 		end
 		
-		attr :task_class
-		
-		def name
-			@task_class.name
+		def task_class
+			nil
 		end
 		
 		def apply!(scope)
-			scope.instance_exec(*@arguments, &@target.build)
-		end
-		
-		def inspect
-			@task_class.name.inspect
+			@environment.flatten do |environment|
+				task_class = Rulebook.for(environment).with(Task, environment: environment.to_hash)
+				
+				environment.update!(task_class.new)
+			end
 		end
 		
 		def to_s
-			"#<#{self.class} #{@target.name}>"
+			"#<#{self.class}>"
 		end
 	end
 end

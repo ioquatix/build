@@ -42,7 +42,7 @@ RSpec.describe Build::Rulebook do
 			end
 		end
 		
-		rulebook = Build::Rulebook.for(environment)
+		rulebook = Build::Rulebook.for(environment.flatten)
 		
 		expect(rulebook.rules.size).to be 2
 		

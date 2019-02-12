@@ -51,7 +51,7 @@ module Build
 			
 			@group = group
 			
-			@logger = logger || Logger.new($stderr)
+			@logger = logger
 		end
 		
 		def wet?
@@ -60,7 +60,7 @@ module Build
 		
 		def spawn(*arguments)
 			if wet?
-				@logger.info(:shell) {arguments}
+				@logger&.info(:shell) {arguments}
 				status = @group.spawn(*arguments)
 				
 				if status != 0
@@ -80,21 +80,21 @@ module Build
 		def touch(path)
 			return unless wet?
 			
-			@logger.info(:shell) {['touch', path]}
+			@logger&.info(:shell) {['touch', path]}
 			FileUtils.touch(path)
 		end
 		
 		def cp(source_path, destination_path)
 			return unless wet?
 			
-			@logger.info(:shell) {['cp', source_path, destination_path]}
+			@logger&.info(:shell) {['cp', source_path, destination_path]}
 			FileUtils.copy(source_path, destination_path)
 		end
 		
 		def rm(path)
 			return unless wet?
 			
-			@logger.info(:shell) {['rm -rf', path]}
+			@logger&.info(:shell) {['rm -rf', path]}
 			FileUtils.rm_rf(path)
 		end
 		
@@ -102,7 +102,7 @@ module Build
 			return unless wet?
 			
 			unless File.exist?(path)
-				@logger.info(:shell) {['mkpath', path]}
+				@logger&.info(:shell) {['mkpath', path]}
 				FileUtils.mkpath(path)
 			end
 		end
@@ -110,22 +110,17 @@ module Build
 		def install(source_path, destination_path)
 			return unless wet?
 			
-			@logger.info(:shell) {['install', source_path, destination_path]}
+			@logger&.info(:shell) {['install', source_path, destination_path]}
 			FileUtils.install(source_path, destination_path)
 		end
 		
 		def write(path, data, mode = "w")
 			return unless wet?
 			
-			@logger.info(:shell) {["write", path, "#{data.size}bytes"]}
+			@logger&.info(:shell) {["write", path, "#{data.size}bytes"]}
 			File.open(path, mode) do |file|
 				file.write(data)
 			end
-		end
-		
-		# @deprecated Please use {#self} instead.
-		def fs
-			self
 		end
 		
 		def update
@@ -135,12 +130,12 @@ module Build
 		def invoke_rule(rule, arguments, &block)
 			arguments = rule.normalize(arguments, self)
 			
-			@logger.debug(:invoke) {"-> #{rule}(#{arguments.inspect})"}
+			@logger&.debug(:invoke) {"-> #{rule}(#{arguments.inspect})"}
 			
 			node = RuleNode.new(rule, arguments, &block)
 			task = invoke(node)
 			
-			@logger.debug(:invoke) {"<- #{rule}(...) -> #{rule.result(arguments)}"}
+			@logger&.debug(:invoke) {"<- #{rule}(...) -> #{rule.result(arguments)}"}
 			
 			return rule.result(arguments)
 		end

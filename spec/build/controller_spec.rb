@@ -24,24 +24,8 @@ require 'build/rulebook'
 require 'build/controller'
 
 RSpec.describe Build::Controller do
-	let(:target_class) do
-		Class.new do
-			def initialize(name)
-				@name = name
-			end
-			
-			attr :name
-			
-			def build(&block)
-				@build = block if block_given?
-				
-				return @build
-			end
-		end
-	end
-	
 	it "build graph should fail" do
-		environment = Build::Environment.new do
+		rules = Build::Environment.new do
 			define Build::Rule, "make.file" do
 				output :destination
 				
@@ -51,14 +35,14 @@ RSpec.describe Build::Controller do
 			end
 		end
 		
-		target = target_class.new('fail')
-		target.build do
+		target = Build::Environment.new(rules) do |rules|
 			foo_path = Build::Files::Path['foo']
-			make destination: foo_path
+			
+			rules.make destination: foo_path
 		end
 		
 		controller = Build::Controller.new do |controller|
-			controller.add_target(target, environment)
+			controller.add_environment(target)
 		end
 		
 		controller.logger.level = Logger::DEBUG
@@ -69,7 +53,7 @@ RSpec.describe Build::Controller do
 	end
 	
 	it "should execute the build graph" do
-		environment = Build::Environment.new do
+		rules = Build::Environment.new do
 			define Build::Rule, "make.file" do
 				output :destination
 				
@@ -88,18 +72,16 @@ RSpec.describe Build::Controller do
 			end
 		end
 		
-		target = target_class.new('copy')
-		target.build do
+		target = Build::Environment.new(rules) do |graph|
 			foo_path = Build::Files::Path['foo']
 			bar_path = Build::Files::Path['bar']
 			
-			make destination: foo_path
-			
-			copy source: foo_path, destination: bar_path
+			graph.make destination: foo_path
+			graph.copy source: foo_path, destination: bar_path
 		end
 		
 		controller = Build::Controller.new do |controller|
-			controller.add_target(target, environment)
+			controller.add_environment(target)
 		end
 		
 		expect(controller.nodes.size).to be 1

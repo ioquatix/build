@@ -19,7 +19,7 @@
 # THE SOFTWARE.
 
 module Build
-	# A rule is a function with a specific set of input and output parameters, which can match against a given set of specific inputs and outputs. For example, there might be several rules for compiling, but the specific rules depend on the language being compiled.
+	# A rule is a function with a specific set of input and output parameters, which can match against a given set of specific arguments. For example, there might be several rules for compiling, but the specific rules depend on the language being compiled.
 	class Rule
 		class Parameter
 			def initialize(direction, name, options = {}, &block)
