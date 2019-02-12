@@ -22,23 +22,46 @@ require 'build/files'
 require 'build/graph'
 
 module Build
+	class EnvironmentTask < Graph::Task
+		def initialize(walker, node, group, logger: nil)
+			super(walker, node)
+			
+			@group = group
+			@logger = logger
+		end
+		
+		def update
+			@node.apply!(self)
+		end
+		
+		attr :group
+		attr :logger
+	end
+	
 	class EnvironmentNode < Graph::Node
-		def initialize(environment, process = environment)
+		def initialize(environment)
 			@environment = environment
 			
 			# Wait here, for all dependent targets, to be done:
-			super(Files::List::NONE, :inherit, process)
+			super(Files::List::NONE, :inherit, environment)
 		end
 		
 		def task_class
-			nil
+			EnvironmentTask
 		end
 		
 		def apply!(scope)
 			@environment.flatten do |environment|
-				task_class = Rulebook.for(environment).with(Task, environment: environment.to_hash)
+				parent = environment.parent || Build::Environment.new
 				
-				environment.update!(task_class.new)
+				task_class = Rulebook.for(parent).with(Task, environment: parent.flatten)
+				task = task_class.new(scope.walker, self, scope.group, logger: scope.logger)
+				
+				scope.walker.with(task_class: task_class) do
+					task.visit do
+						environment.update!(task)
+					end
+				end
 			end
 		end
 		

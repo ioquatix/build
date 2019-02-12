@@ -27,7 +27,6 @@ require_relative 'rulebook'
 require_relative 'name'
 
 require_relative 'rule_node'
-require_relative 'target_node'
 require_relative 'environment_node'
 require_relative 'task'
 

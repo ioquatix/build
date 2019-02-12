@@ -36,12 +36,12 @@ module Build
 			processes = @processes[rule.process_name] ||= []
 			processes << rule
 		end
-
+		
 		def [] name
 			@rules[name]
 		end
 		
-		def with(superclass, state = {})
+		def with(superclass, **state)
 			task_class = Class.new(superclass)
 			
 			# Define methods for all processes, e.g. task_class#compile
@@ -65,6 +65,7 @@ module Build
 				end
 			end
 			
+			# Typically, this defines methods like #environment and #target which can be accessed in the build rule.
 			state.each do |key, value|
 				task_class.send(:define_method, key) do
 					value
@@ -78,13 +79,7 @@ module Build
 			rulebook = self.new
 			
 			environment.defined.each do |name, define|
-				object = define.klass.new(*name.split('.', 2))
-				
-				object.instance_eval(&define.block)
-				
-				object.freeze
-				
-				rulebook << object
+				rulebook << define.klass.build(name, &define.block)
 			end
 			
 			return rulebook

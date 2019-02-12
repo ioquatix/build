@@ -35,10 +35,10 @@ RSpec.describe Build::Controller do
 			end
 		end
 		
-		target = Build::Environment.new(rules) do |rules|
+		target = Build::Environment.new(rules) do |graph|
 			foo_path = Build::Files::Path['foo']
 			
-			rules.make destination: foo_path
+			graph.make destination: foo_path
 		end
 		
 		controller = Build::Controller.new do |controller|

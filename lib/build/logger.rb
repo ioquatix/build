@@ -64,11 +64,11 @@ module Build
 			
 			buffer << "\n"
 			
-			# if environment
-			# 	environment.each do |key,value|
-			# 		buffer << "\texport #{key}=#{value.dump}\n"
-			# 	end
-			# end
+			if environment
+				environment.each do |key, value|
+					buffer << "\texport #{key}=#{value.dump}\n"
+				end
+			end
 		end
 		
 		def format_exception(exception, buffer)

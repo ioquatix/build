@@ -21,6 +21,14 @@
 module Build
 	# A rule is a function with a specific set of input and output parameters, which can match against a given set of specific arguments. For example, there might be several rules for compiling, but the specific rules depend on the language being compiled.
 	class Rule
+		def self.build(name, &block)
+			rule = self.new(*name.split('.', 2))
+			
+			rule.instance_eval(&block)
+			
+			return rule.freeze
+		end
+		
 		class Parameter
 			def initialize(direction, name, options = {}, &block)
 				@direction = direction
@@ -118,6 +126,21 @@ module Build
 		attr :full_name
 		
 		attr :primary_output
+		
+		def freeze
+			return self if frozen?
+			
+			@name.freeze
+			@full_name.freeze
+			@process_name.freeze
+			@type.freeze
+			
+			@apply.freeze
+			@parameters.freeze
+			@primary_output.freeze
+			
+			super
+		end
 		
 		def input(name, options = {}, &block)
 			self << Parameter.new(:input, name, options, &block)
