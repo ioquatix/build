@@ -49,10 +49,14 @@ module Build
 		def initialize(walker, node, group, logger: nil)
 			super(walker, node)
 			
+			@environment = environment
 			@group = group
-			
 			@logger = logger
 		end
+		
+		attr :environment
+		attr :group
+		attr :logger
 		
 		def wet?
 			@node.dirty?

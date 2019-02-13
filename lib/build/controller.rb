@@ -73,8 +73,8 @@ module Build
 		end
 		
 		# Add a build environment to the controller.
-		def add_environment(environment)
-			@nodes << EnvironmentNode.new(environment)
+		def add_environment(environment, *arguments)
+			@nodes << EnvironmentNode.new(environment, *arguments)
 		end
 		
 		def update

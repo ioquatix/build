@@ -72,6 +72,11 @@ module Build
 				end
 			end
 			
+			rulebook = self
+			task_class.send(:define_method, :rulebook) do
+				rulebook
+			end
+			
 			return task_class
 		end
 		

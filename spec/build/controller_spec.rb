@@ -35,10 +35,10 @@ RSpec.describe Build::Controller do
 			end
 		end
 		
-		target = Build::Environment.new(rules) do |graph|
+		target = Build::Environment.new(rules) do
 			foo_path = Build::Files::Path['foo']
 			
-			graph.make destination: foo_path
+			make destination: foo_path
 		end
 		
 		controller = Build::Controller.new do |controller|
@@ -72,12 +72,12 @@ RSpec.describe Build::Controller do
 			end
 		end
 		
-		target = Build::Environment.new(rules) do |graph|
+		target = Build::Environment.new(rules) do
 			foo_path = Build::Files::Path['foo']
 			bar_path = Build::Files::Path['bar']
 			
-			graph.make destination: foo_path
-			graph.copy source: foo_path, destination: bar_path
+			make destination: foo_path
+			copy source: foo_path, destination: bar_path
 		end
 		
 		controller = Build::Controller.new do |controller|
