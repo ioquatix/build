@@ -64,9 +64,11 @@ module Build
 			
 			buffer << "\n"
 			
-			if environment
-				environment.each do |key, value|
-					buffer << "\texport #{key}=#{value.dump}\n"
+			if @verbose
+				if environment
+					environment.each do |key, value|
+						buffer << "\texport #{key}=#{value.dump}\n"
+					end
 				end
 			end
 		end
