@@ -1,4 +1,4 @@
-# Copyright, 2016, by Samuel G. D. Williams. <http://www.codeotaku.com>
+# Copyright, 2018, by Samuel G. D. Williams. <http://www.codeotaku.com>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -24,33 +24,67 @@ require 'build/graph'
 require_relative 'task'
 
 module Build
-	class EnvironmentNode < Graph::Node
-		def initialize(environment, *arguments)
-			@environment = environment
+	class ChainNode < Graph::Node
+		def initialize(chain, arguments, environment)
+			@chain = chain
 			@arguments = arguments
+			@environment = environment
 			
 			# Wait here, for all dependent targets, to be done:
-			super(Files::List::NONE, :inherit, environment)
+			super(Files::List::NONE, :inherit, chain)
 		end
 		
 		def task_class
 			Task
 		end
 		
-		def apply!(scope)
-			@environment.flatten do |environment|
-				parent = environment.parent&.flatten || Build::Environment.new
+		def apply_dependency(scope, dependency)
+			# puts "Traversing #{dependency.name}..."
+			
+			# Not sure why need first
+			provision = @chain.resolved[dependency].first
+			
+			environments = [@environment]
+			public_environments = []
+			
+			provision.each_dependency do |dependency|
+				if environment = apply_dependency(scope, dependency)
+					environments << environment
+					
+					unless dependency.private?
+						public_environments << environment
+					end
+				end
+			end
+			
+			unless dependency.alias?
+				# puts "Building #{dependency.name}: #{provision.value}..."
 				
-				task_class = Rulebook.for(parent).with(Task, environment: parent.evaluate)
+				local_environment = Build::Environment.combine(*environments)&.evaluate || Build::Environment.new
+				
+				task_class = Rulebook.for(local_environment).with(Task, environment: local_environment)
+				
 				task = task_class.new(scope.walker, self, scope.group, logger: scope.logger)
+				
+				output_environment = nil
 				
 				scope.walker.with(task_class: task_class) do
 					task.visit do
-						environment.update! do |update|
-							environment.construct!(task, *@arguments, &update)
-						end
+						output_environment = Build::Environment.new(local_environment)
+						
+						output_environment.construct!(task, *@arguments, &provision.value)
+						
+						public_environments << output_environment.dup(parent: nil)
 					end
 				end
+			end
+			
+			return Build::Environment.combine(*public_environments)
+		end
+		
+		def apply!(scope)
+			@chain.dependencies.each do |dependency|
+				apply_dependency(scope, dependency)
 			end
 		end
 		

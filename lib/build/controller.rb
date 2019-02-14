@@ -27,7 +27,7 @@ require_relative 'rulebook'
 require_relative 'name'
 
 require_relative 'rule_node'
-require_relative 'environment_node'
+require_relative 'chain_node'
 require_relative 'task'
 
 require_relative 'logger'
@@ -73,8 +73,8 @@ module Build
 		end
 		
 		# Add a build environment to the controller.
-		def add_environment(environment, *arguments)
-			@nodes << EnvironmentNode.new(environment, *arguments)
+		def add_chain(chain, arguments = [], environment)
+			@nodes << ChainNode.new(chain, arguments, environment)
 		end
 		
 		def update
