@@ -39,28 +39,41 @@ module Build
 		end
 		
 		def apply_dependency(scope, dependency)
-			# puts "Traversing #{dependency.name}..."
+			logger = scope.logger
 			
-			# Not sure why need first
-			provision = @chain.resolved[dependency].first
+			# logger.debug {"Traversing: #{dependency}..."}
 			
 			environments = [@environment]
 			public_environments = []
+			provisions = @chain.resolved[dependency]
+			public_alias = dependency.alias?
 			
-			provision.each_dependency do |dependency|
-				if environment = apply_dependency(scope, dependency)
-					environments << environment
-					
-					unless dependency.private?
-						public_environments << environment
+			provisions.each do |provision|
+				provision.each_dependency do |nested_dependency|
+					if environment = apply_dependency(scope, nested_dependency)
+						# logger.debug("Evaluating #{nested_dependency} -> #{provision} generated: #{environment}")
+						
+						environments << environment
+						
+						if public_alias || nested_dependency.public?
+							public_environments << environment
+						# else
+						# 	logger.debug("Skipping #{nested_dependency} in public environment.")
+						end
 					end
 				end
 			end
 			
 			unless dependency.alias?
-				# puts "Building #{dependency.name}: #{provision.value}..."
+				logger.debug {"Building: #{dependency}"}
+				
+				# environments.each do |environment|
+				# 	logger.debug {"Using #{environment}"}
+				# end
 				
 				local_environment = Build::Environment.combine(*environments)&.evaluate || Build::Environment.new
+				
+				# logger.debug("Local Environment: #{local_environment}")
 				
 				task_class = Rulebook.for(local_environment).with(Task, environment: local_environment)
 				
@@ -70,11 +83,13 @@ module Build
 				
 				scope.walker.with(task_class: task_class) do
 					task.visit do
-						output_environment = Build::Environment.new(local_environment)
+						output_environment = Build::Environment.new(local_environment, name: dependency.name)
 						
-						output_environment.construct!(task, *@arguments, &provision.value)
+						provisions.each do |provision|
+							output_environment.construct!(task, *@arguments, &provision.value)
+						end
 						
-						public_environments << output_environment.dup(parent: nil)
+						public_environments << output_environment.dup(parent: nil, name: dependency.name)
 					end
 				end
 			end
