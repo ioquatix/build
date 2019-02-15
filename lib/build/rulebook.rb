@@ -22,7 +22,8 @@ require_relative 'rule'
 
 module Build
 	class Rulebook
-		def initialize
+		def initialize(name = nil)
+			@name = name
 			@rules = {}
 			@processes = {}
 		end
@@ -43,6 +44,11 @@ module Build
 		
 		def with(superclass, **state)
 			task_class = Class.new(superclass)
+			
+			# name = @name
+			# task_class.send(:define_method, :to_s) do
+			# 	"name"
+			# end
 			
 			# Define methods for all processes, e.g. task_class#compile
 			@processes.each do |key, rules|
@@ -72,16 +78,11 @@ module Build
 				end
 			end
 			
-			rulebook = self
-			task_class.send(:define_method, :rulebook) do
-				rulebook
-			end
-			
 			return task_class
 		end
 		
 		def self.for(environment)
-			rulebook = self.new
+			rulebook = self.new(environment.name)
 			
 			environment.defined.each do |name, define|
 				rulebook << define.klass.build(name, &define.block)
