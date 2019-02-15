@@ -18,8 +18,8 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = '>= 2.0'
 	
 	spec.add_dependency "build-graph", "~> 1.0"
-	spec.add_dependency "build-environment", "~> 1.2"
-	spec.add_dependency "build-dependency", "~> 1.2"
+	spec.add_dependency "build-environment", "~> 1.3"
+	spec.add_dependency "build-dependency", "~> 1.4"
 	spec.add_dependency "build-makefile", "~> 1.0"
 	
 	spec.add_dependency "graphviz"
