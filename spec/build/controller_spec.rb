@@ -78,6 +78,7 @@ RSpec.describe Build::Controller do
 						output :destination
 						
 						apply do |parameters|
+							run! 'sleep 0.1'
 							touch parameters[:destination]
 						end
 					end
