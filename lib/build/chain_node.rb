@@ -76,21 +76,19 @@ module Build
 				# logger.debug("Local Environment: #{local_environment}")
 				
 				task_class = Rulebook.for(local_environment).with(Task, environment: local_environment)
-				
 				task = task_class.new(scope.walker, self, scope.group, logger: scope.logger)
 				
 				output_environment = nil
 				
-				scope.walker.with(task_class: task_class) do
-					task.visit do
-						output_environment = Build::Environment.new(local_environment, name: dependency.name)
-						
-						provisions.each do |provision|
-							output_environment.construct!(task, *@arguments, &provision.value)
-						end
-						
-						public_environments << output_environment.dup(parent: nil, name: dependency.name)
+				task.visit do
+					output_environment = Build::Environment.new(local_environment, name: dependency.name)
+					
+					provisions.each do |provision|
+						# When executing the environment build steps, we create new build nodes. But those build nodes are not capturing the right task class.
+						output_environment.construct!(task, *@arguments, &provision.value)
 					end
+					
+					public_environments << output_environment.dup(parent: nil, name: dependency.name)
 				end
 			end
 			

@@ -60,7 +60,8 @@ module Build
 		attr :nodes
 		attr :walker
 		
-		private def step(walker, node, task_class:)
+		private def step(walker, node, parent_task = nil)
+			task_class = parent_task&.class || Task
 			task = task_class.new(walker, node, @group, logger: @logger)
 			
 			task.visit do
@@ -81,7 +82,7 @@ module Build
 			@nodes.each do |node|
 				# We wait for all processes to complete within each node. The result is that we don't execute top level nodes concurrently, but we do execute within each node concurrently where possible. Ideally, some node could be executed concurrently, but right now expressing non-file dependencies between nodes is not possible.
 				@group.wait do
-					@walker.call(node, task_class: node.task_class)
+					@walker.call(node)
 				end
 			end
 		end
