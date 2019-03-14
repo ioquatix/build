@@ -21,6 +21,8 @@
 require 'fileutils'
 require 'build/graph'
 
+require 'event/shell'
+
 module Build
 	# This task class serves as the base class for the environment specific task classes genearted when adding targets.
 	class Task < Graph::Task
@@ -62,7 +64,7 @@ module Build
 		
 		def spawn(*arguments)
 			if wet?
-				@logger&.info(:shell) {arguments}
+				@logger&.info(self) {Event::Shell.for(*arguments)}
 				status = @group.spawn(*arguments)
 				
 				if status != 0
@@ -82,21 +84,21 @@ module Build
 		def touch(path)
 			return unless wet?
 			
-			@logger&.info(:shell) {['touch', path]}
+			@logger&.info(self) {Event::Shell.for('touch', path)}
 			FileUtils.touch(path)
 		end
 		
 		def cp(source_path, destination_path)
 			return unless wet?
 			
-			@logger&.info(:shell) {['cp', source_path, destination_path]}
+			@logger&.info(self) {Event::Shell.for('cp', source_path, destination_path)}
 			FileUtils.copy(source_path, destination_path)
 		end
 		
 		def rm(path)
 			return unless wet?
 			
-			@logger&.info(:shell) {['rm -rf', path]}
+			@logger&.info(self) {Event::Shell.for('rm -rf', path)}
 			FileUtils.rm_rf(path)
 		end
 		
@@ -104,7 +106,7 @@ module Build
 			return unless wet?
 			
 			unless File.exist?(path)
-				@logger&.info(:shell) {['mkpath', path]}
+				@logger&.info(self) {Event::Shell.for('mkpath', path)}
 				FileUtils.mkpath(path)
 			end
 		end
@@ -112,14 +114,14 @@ module Build
 		def install(source_path, destination_path)
 			return unless wet?
 			
-			@logger&.info(:shell) {['install', source_path, destination_path]}
+			@logger&.info(self) {Event::Shell.for('install', source_path, destination_path)}
 			FileUtils.install(source_path, destination_path)
 		end
 		
 		def write(path, data, mode = "w")
 			return unless wet?
 			
-			@logger&.info(:shell) {["write", path, "#{data.size}bytes"]}
+			@logger&.info(self) {Event::Shell.for("write", path, "#{data.size}bytes")}
 			File.open(path, mode) do |file|
 				file.write(data)
 			end
@@ -132,13 +134,13 @@ module Build
 		def invoke_rule(rule, arguments, &block)
 			arguments = rule.normalize(arguments, self)
 			
-			@logger&.debug(:invoke) {"-> #{rule}(#{arguments.inspect})"}
+			@logger&.debug(self) {"-> #{rule}(#{arguments.inspect})"}
 			
 			invoke(
 				RuleNode.new(rule, arguments, &block)
 			)
 			
-			@logger&.debug(:invoke) {"<- #{rule}(...) -> #{rule.result(arguments)}"}
+			@logger&.debug(self) {"<- #{rule}(...) -> #{rule.result(arguments)}"}
 			
 			return rule.result(arguments)
 		end

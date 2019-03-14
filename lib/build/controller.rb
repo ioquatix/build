@@ -30,17 +30,14 @@ require_relative 'rule_node'
 require_relative 'chain_node'
 require_relative 'task'
 
-require_relative 'logger'
+require 'event/console'
 
 module Build
 	class Controller
-		def initialize(logger: nil, limit: nil)
+		def initialize(logger: Event::Console.logger, limit: nil)
 			@module = Module.new
 			
-			@logger = logger || Logger.new($stdout).tap do |logger|
-				logger.level = Logger::INFO
-				logger.formatter = CompactFormatter.new
-			end
+			@logger = logger
 			
 			# Top level nodes, for sanity this is a static list.
 			@nodes = []

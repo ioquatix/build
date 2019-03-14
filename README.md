@@ -10,15 +10,15 @@ Build is a ruby gem providing systems for building task driven build systems sim
 
 Add this line to your application's Gemfile:
 
-    gem 'build'
+	gem 'build'
 
 And then execute:
 
-    $ bundle
+	$ bundle
 
 Or install it yourself as:
 
-    $ gem install build
+	$ gem install build
 
 ## Usage
 
