@@ -22,6 +22,10 @@ module Build
 	class Name
 		def initialize(text)
 			@text = text
+			
+			@identifier = nil
+			@target = nil
+			@key = nil
 		end
 		
 		def self.from_target(string)
@@ -36,6 +40,10 @@ module Build
 		
 		def target
 			@target ||= @text.gsub(/\s+/, '-').downcase
+		end
+		
+		def key(*postfix)
+			@key ||= ([@text] + postfix).collect{|part| part.downcase.gsub(/\s+/, '_')}.join('_')
 		end
 		
 		def macro(prefix = [])

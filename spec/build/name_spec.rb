@@ -34,6 +34,10 @@ RSpec.describe Build::Name do
 		expect(name.target).to be == 'foo-bar'
 	end
 	
+	it "should generate useful key names" do
+		expect(name.key('executable')).to be == 'foo_bar_executable'
+	end
+	
 	it "should generate useful macro names" do
 		expect(name.macro).to be == 'FOO_BAR'
 	end
