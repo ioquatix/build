@@ -34,22 +34,27 @@ module Build
 		
 		attr :text
 		
+		# @return [String] suitable for constant identifier.
 		def identifier
 			@identifier ||= @text.gsub(/\s+/, '')
 		end
 		
+		# @return [String] suitable for target name.
 		def target
 			@target ||= @text.gsub(/\s+/, '-').downcase
 		end
 		
+		# @return [String] suitable for variable name.
 		def key(*postfix)
 			@key ||= ([@text] + postfix).collect{|part| part.downcase.gsub(/\s+/, '_')}.join('_')
 		end
 		
+		# @return [String] suitable for C macro name.
 		def macro(prefix = [])
 			(Array(prefix) + [@text]).collect{|name| name.upcase.gsub(/\s+/, '_')}.join('_')
 		end
 		
+		# @return [String] suitable for C header guard macro.
 		def header_guard(path)
 			macro(path) + '_H'
 		end
