@@ -30,7 +30,7 @@ require_relative 'rule_node'
 require_relative 'chain_node'
 require_relative 'task'
 
-require 'event/console'
+require 'console'
 
 module Build
 	class Controller
