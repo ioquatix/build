@@ -23,7 +23,7 @@ Gem::Specification.new do |spec|
 	spec.add_dependency "build-makefile", "~> 1.0"
 	
 	spec.add_dependency "graphviz", "~> 1.0"
-	spec.add_dependency "event", "~> 1.0"
+	spec.add_dependency "console", "~> 1.0"
 	
 	spec.add_development_dependency "covered"
 	spec.add_development_dependency "bundler"

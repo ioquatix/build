@@ -21,7 +21,7 @@
 require 'fileutils'
 require 'build/graph'
 
-require 'event/shell'
+require 'console/shell'
 
 module Build
 	# This task class serves as the base class for the environment specific task classes genearted when adding targets.
@@ -64,7 +64,7 @@ module Build
 		
 		def spawn(*arguments)
 			if wet?
-				@logger&.info(self) {Event::Shell.for(*arguments)}
+				@logger&.info(self) {Console::Shell.for(*arguments)}
 				status = @group.spawn(*arguments)
 				
 				if status != 0
@@ -84,21 +84,21 @@ module Build
 		def touch(path)
 			return unless wet?
 			
-			@logger&.info(self) {Event::Shell.for('touch', path)}
+			@logger&.info(self) {Console::Shell.for('touch', path)}
 			FileUtils.touch(path)
 		end
 		
 		def cp(source_path, destination_path)
 			return unless wet?
 			
-			@logger&.info(self) {Event::Shell.for('cp', source_path, destination_path)}
+			@logger&.info(self) {Console::Shell.for('cp', source_path, destination_path)}
 			FileUtils.copy(source_path, destination_path)
 		end
 		
 		def rm(path)
 			return unless wet?
 			
-			@logger&.info(self) {Event::Shell.for('rm -rf', path)}
+			@logger&.info(self) {Console::Shell.for('rm -rf', path)}
 			FileUtils.rm_rf(path)
 		end
 		
@@ -106,7 +106,7 @@ module Build
 			return unless wet?
 			
 			unless File.exist?(path)
-				@logger&.info(self) {Event::Shell.for('mkpath', path)}
+				@logger&.info(self) {Console::Shell.for('mkpath', path)}
 				FileUtils.mkpath(path)
 			end
 		end
@@ -114,14 +114,14 @@ module Build
 		def install(source_path, destination_path)
 			return unless wet?
 			
-			@logger&.info(self) {Event::Shell.for('install', source_path, destination_path)}
+			@logger&.info(self) {Console::Shell.for('install', source_path, destination_path)}
 			FileUtils.install(source_path, destination_path)
 		end
 		
 		def write(path, data, mode = "w")
 			return unless wet?
 			
-			@logger&.info(self) {Event::Shell.for("write", path, "#{data.size}bytes")}
+			@logger&.info(self) {Console::Shell.for("write", path, "#{data.size}bytes")}
 			File.open(path, mode) do |file|
 				file.write(data)
 			end

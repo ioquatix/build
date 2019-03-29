@@ -34,7 +34,7 @@ require 'event/console'
 
 module Build
 	class Controller
-		def initialize(logger: Event::Console.logger, limit: nil)
+		def initialize(logger: Console.logger, limit: nil)
 			@module = Module.new
 			
 			@logger = logger
