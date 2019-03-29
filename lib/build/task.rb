@@ -21,7 +21,7 @@
 require 'fileutils'
 require 'build/graph'
 
-require 'console/shell'
+require 'console/event/spawn'
 
 module Build
 	# This task class serves as the base class for the environment specific task classes genearted when adding targets.
@@ -55,6 +55,10 @@ module Build
 			@logger = logger
 		end
 		
+		def to_s
+			"\#<#{Task} #{node.name}>"
+		end
+		
 		attr :group
 		attr :logger
 		
@@ -64,7 +68,7 @@ module Build
 		
 		def spawn(*arguments)
 			if wet?
-				@logger&.info(self) {Console::Shell.for(*arguments)}
+				@logger&.info(self) {Console::Event::Spawn.for(*arguments)}
 				status = @group.spawn(*arguments)
 				
 				if status != 0

@@ -34,6 +34,10 @@ module Build
 			super(Files::List::NONE, :inherit, chain)
 		end
 		
+		def name
+			@environment.name
+		end
+		
 		def task_class
 			Task
 		end
