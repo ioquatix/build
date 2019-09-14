@@ -43,6 +43,7 @@ module Build
 			attr :name
 			
 			attr :options
+			attr :dynamic
 			
 			def input?
 				@direction == :input
@@ -94,6 +95,15 @@ module Build
 				else
 					arguments[@name]
 				end || @options[:default]
+			end
+			
+			def hash
+				[self.class, @direction, @name, @options].hash
+			end
+			
+			# TODO fix implementation
+			def eql? other
+				other.kind_of?(self.class) and @direction.eql?(other.direction) and @name.eql?(other.name) and @options.eql?(other.options) # and @dynamic == other.dynamic
 			end
 			
 			def inspect
@@ -217,8 +227,12 @@ module Build
 			end
 		end
 		
-		def ==(other)
-			other.kind_of?(self.class) and @name == other.name and @parameters == other.parameters
+		def hash
+			[self.class, @name, @parameters].hash
+		end
+		
+		def eql?(other)
+			other.kind_of?(self.class) and @name.eql?(other.name) and @parameters.eql?(other.parameters)
 		end
 		
 		def to_s
