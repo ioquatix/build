@@ -88,13 +88,15 @@ module Build
 			def compute(arguments, scope)
 				if implicit?
 					# Can be replaced if supplied:
-					arguments[@name] || scope.instance_exec(arguments, &@dynamic)
+					arguments[@name] || scope.instance_exec(arguments, &@dynamic) || @options[:default]
 				elsif dynamic?
 					# Argument is optional:
-					scope.instance_exec(arguments[@name], arguments, &@dynamic)
-				else
+					scope.instance_exec(arguments[@name], arguments, &@dynamic) || @options[:default]
+				elsif arguments.key?(@name)
 					arguments[@name]
-				end || @options[:default]
+				else
+					@options[:default]
+				end
 			end
 			
 			def hash
