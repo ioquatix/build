@@ -49,8 +49,10 @@ module Build
 			
 			environments = [@environment]
 			public_environments = []
-			provisions = @chain.resolved[dependency]
 			public_alias = dependency.alias?
+			
+			# Lookup what things this dependency provides:
+			provisions = @chain.resolved[dependency]
 			
 			provisions.each do |provision|
 				provision.each_dependency do |nested_dependency|
@@ -99,7 +101,9 @@ module Build
 			return Build::Environment.combine(*public_environments)
 		end
 		
+		# This is the main entry point when invoking the node from a task.
 		def apply!(scope)
+			# Go through all the dependencies in order and apply them to the given scope:
 			@chain.dependencies.each do |dependency|
 				apply_dependency(scope, dependency)
 			end
