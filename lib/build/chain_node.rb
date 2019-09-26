@@ -42,12 +42,13 @@ module Build
 			Task
 		end
 		
-		def apply_dependency(scope, dependency)
+		def apply_dependency(scope, dependency, tasks = [])
 			logger = scope.logger
 			
 			# logger.debug {"Traversing: #{dependency}..."}
 			
 			environments = [@environment]
+			
 			public_environments = []
 			public_alias = dependency.alias?
 			
@@ -56,7 +57,7 @@ module Build
 			
 			provisions.each do |provision|
 				provision.each_dependency do |nested_dependency|
-					if environment = apply_dependency(scope, nested_dependency)
+					if environment = apply_dependency(scope, nested_dependency, tasks)
 						# logger.debug("Evaluating #{nested_dependency} -> #{provision} generated: #{environment}")
 						
 						environments << environment
@@ -82,9 +83,8 @@ module Build
 				# logger.debug("Local Environment: #{local_environment}")
 				
 				task_class = Rulebook.for(local_environment).with(Task, environment: local_environment)
-				task = task_class.new(scope.walker, self, scope.group, logger: scope.logger)
-				
-				output_environment = nil
+				task = task_class.new(scope.walker, self, scope.group, logger: scope.logger, dependencies: tasks.dup)
+				tasks.clear
 				
 				task.visit do
 					output_environment = Build::Environment.new(local_environment, name: dependency.name)
@@ -96,6 +96,8 @@ module Build
 					
 					public_environments << output_environment.dup(parent: nil, name: dependency.name)
 				end
+				
+				tasks << task
 			end
 			
 			return Build::Environment.combine(*public_environments)

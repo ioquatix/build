@@ -48,8 +48,8 @@ module Build
 			attr :status
 		end
 		
-		def initialize(walker, node, group, logger: nil)
-			super(walker, node)
+		def initialize(walker, node, group, logger: nil, **options)
+			super(walker, node, **options)
 			
 			@group = group
 			@logger = logger
