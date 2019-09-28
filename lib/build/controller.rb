@@ -57,8 +57,8 @@ module Build
 		attr :nodes
 		attr :walker
 		
-		private def step(walker, node, parent_task = nil)
-			task_class = parent_task&.class || Task
+		def step(walker, node, parent_task = nil)
+			task_class = node.task_class(parent_task) || Task
 			task = task_class.new(walker, node, @group, logger: @logger)
 			
 			task.visit do

@@ -46,7 +46,7 @@ RSpec.describe Build::Controller do
 		let(:build_target) do
 			Target.new("foo") do |target|
 				target.depends "make"
-			
+				
 				target.provides "foo" do
 					foo_path = Build::Files::Path['foo']
 					

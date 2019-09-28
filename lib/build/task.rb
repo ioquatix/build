@@ -26,28 +26,6 @@ require 'console/event/spawn'
 module Build
 	# This task class serves as the base class for the environment specific task classes genearted when adding targets.
 	class Task < Graph::Task
-		class CommandFailure < Graph::TransientError
-			def initialize(task, arguments, status)
-				@task = task
-				@arguments = arguments
-				@status = status
-				
-				super "#{File.basename(executable_name).inspect} exited with status #{@status.to_i}"
-			end
-			
-			def executable_name
-				if @arguments[0].kind_of? Hash
-					@arguments[1]
-				else
-					@arguments[0]
-				end
-			end
-			
-			attr :task
-			attr :arguments
-			attr :status
-		end
-		
 		def initialize(walker, node, group, logger: nil, **options)
 			super(walker, node, **options)
 			
@@ -55,98 +33,23 @@ module Build
 			@logger = logger
 		end
 		
-		def to_s
-			"\#<#{Task} #{node.name}>"
+		def task_class
+			self.class
 		end
 		
 		attr :group
 		attr :logger
 		
-		def wet?
-			@node.dirty?
-		end
-		
-		def spawn(*arguments)
-			if wet?
-				@logger&.info(self) {Console::Event::Spawn.for(*arguments)}
-				status = @group.spawn(*arguments)
-				
-				if status != 0
-					raise CommandFailure.new(self, arguments, status)
-				end
-			end
-		end
-		
-		def shell_environment
-			@shell_environment ||= environment.flatten.export
-		end
-		
-		def run!(*arguments)
-			self.spawn(shell_environment, *arguments)
-		end
-		
-		def touch(path)
-			return unless wet?
-			
-			@logger&.info(self) {Console::Shell.for('touch', path)}
-			FileUtils.touch(path)
-		end
-		
-		def cp(source_path, destination_path)
-			return unless wet?
-			
-			@logger&.info(self) {Console::Shell.for('cp', source_path, destination_path)}
-			FileUtils.copy(source_path, destination_path)
-		end
-		
-		def rm(path)
-			return unless wet?
-			
-			@logger&.info(self) {Console::Shell.for('rm -rf', path)}
-			FileUtils.rm_rf(path)
-		end
-		
-		def mkpath(path)
-			return unless wet?
-			
-			unless File.exist?(path)
-				@logger&.info(self) {Console::Shell.for('mkpath', path)}
-				FileUtils.mkpath(path)
-			end
-		end
-		
-		def install(source_path, destination_path)
-			return unless wet?
-			
-			@logger&.info(self) {Console::Shell.for('install', source_path, destination_path)}
-			FileUtils.install(source_path, destination_path)
-		end
-		
-		def write(path, data, mode = "w")
-			return unless wet?
-			
-			@logger&.info(self) {Console::Shell.for("write", path, "#{data.size}bytes")}
-			File.open(path, mode) do |file|
-				file.write(data)
-			end
-		end
-		
 		def update
 			@node.apply!(self)
 		end
 		
-		def invoke_rule(rule, arguments, &block)
-			arguments = rule.normalize(arguments, self)
-			
-			@logger&.debug(self) {"-> #{rule}(#{arguments.inspect})"}
-			
-			invoke(
-				RuleNode.new(rule, arguments, &block)
-			)
-			
-			@logger&.debug(self) {"<- #{rule}(...) -> #{rule.result(arguments)}"}
-			
-			return rule.result(arguments)
+		def name
+			self.to_s
+		end
+		
+		def node_string
+			@node.name
 		end
 	end
 end

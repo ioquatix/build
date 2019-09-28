@@ -22,97 +22,58 @@ require 'build/files'
 require 'build/graph'
 
 require_relative 'task'
+require_relative 'dependency_node'
 
 module Build
+	# Responsible for processing a chain into a series of dependency nodes.
 	class ChainNode < Graph::Node
+		# @param chain [Chain] the chain to build.
+		# @param arguments [Array] the arguments to pass to the output environment constructor.
+		# @param anvironment [Build::Environment] the root environment to prepend into the chain.
 		def initialize(chain, arguments, environment)
 			@chain = chain
 			@arguments = arguments
 			@environment = environment
 			
 			# Wait here, for all dependent targets, to be done:
-			super(Files::List::NONE, :inherit, chain)
+			super(Files::List::NONE, :inherit)
+		end
+		
+		attr :chain
+		attr :arguments
+		attr :environment
+		
+		def == other
+			super and
+				@chain == other.chain and
+				@arguments == other.arguments and
+				@environment == other.environment
+		end
+		
+		def hash
+			super ^ @chain.hash ^ @arguments.hash ^ @environment.hash
+		end
+		
+		def task_class(parent_task)
+			Task
 		end
 		
 		def name
 			@environment.name
 		end
 		
-		def task_class
-			Task
-		end
-		
-		def apply_dependency(scope, dependency, tasks = [])
-			logger = scope.logger
-			
-			# logger.debug {"Traversing: #{dependency}..."}
-			
-			environments = [@environment]
-			
-			public_environments = []
-			public_alias = dependency.alias?
-			
-			# Lookup what things this dependency provides:
-			provisions = @chain.resolved[dependency]
-			
-			provisions.each do |provision|
-				provision.each_dependency do |nested_dependency|
-					if environment = apply_dependency(scope, nested_dependency, tasks)
-						# logger.debug("Evaluating #{nested_dependency} -> #{provision} generated: #{environment}")
-						
-						environments << environment
-						
-						if public_alias || nested_dependency.public?
-							public_environments << environment
-						# else
-						# 	logger.debug("Skipping #{nested_dependency} in public environment.")
-						end
-					end
-				end
-			end
-			
-			unless dependency.alias?
-				logger.debug {"Building: #{dependency}"}
-				
-				# environments.each do |environment|
-				# 	logger.debug {"Using #{environment}"}
-				# end
-				
-				local_environment = Build::Environment.combine(*environments)&.evaluate || Build::Environment.new
-				
-				# logger.debug("Local Environment: #{local_environment}")
-				
-				task_class = Rulebook.for(local_environment).with(Task, environment: local_environment)
-				task = task_class.new(scope.walker, self, scope.group, logger: scope.logger, dependencies: tasks.dup)
-				tasks.clear
-				
-				task.visit do
-					output_environment = Build::Environment.new(local_environment, name: dependency.name)
-					
-					provisions.each do |provision|
-						# When executing the environment build steps, we create new build nodes. But those build nodes are not capturing the right task class.
-						output_environment.construct!(task, *@arguments, &provision.value)
-					end
-					
-					public_environments << output_environment.dup(parent: nil, name: dependency.name)
-				end
-				
-				tasks << task
-			end
-			
-			return Build::Environment.combine(*public_environments)
-		end
-		
-		# This is the main entry point when invoking the node from a task.
-		def apply!(scope)
-			# Go through all the dependencies in order and apply them to the given scope:
+		# This is the main entry point when invoking the node from `Build::Task`.
+		def apply!(task)
+			# Go through all the dependencies in order and apply them to the build graph:
 			@chain.dependencies.each do |dependency|
-				apply_dependency(scope, dependency)
+				node = DependencyNode.new(@chain, dependency, @environment, @arguments)
+				
+				task.invoke(node)
 			end
 		end
 		
-		def to_s
-			"#<#{self.class}>"
+		def inspect
+			"#<#{self.class} #{@environment.inspect}>"
 		end
 	end
 end

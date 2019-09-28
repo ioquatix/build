@@ -30,12 +30,27 @@ module Build
 			
 			inputs, outputs = @rule.files(@arguments)
 			
-			super(inputs, outputs, @rule)
+			super(inputs, outputs)
 		end
 		
 		attr :arguments
 		attr :rule
 		attr :callback
+		
+		def == other
+			super and
+				@arguments == other.arguments and
+				@rule == other.rule and
+				@callback == other.callback
+		end
+		
+		def hash
+			super ^ @arguments.hash ^ @rule.hash ^ @callback.hash
+		end
+		
+		def task_class(parent_task)
+			parent_task.class
+		end
 		
 		def name
 			@rule.name
