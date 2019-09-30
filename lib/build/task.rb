@@ -26,8 +26,8 @@ require 'console/event/spawn'
 module Build
 	# This task class serves as the base class for the environment specific task classes genearted when adding targets.
 	class Task < Graph::Task
-		def initialize(walker, node, group, logger: nil, **options)
-			super(walker, node, **options)
+		def initialize(walker, node, group, logger: nil)
+			super(walker, node)
 			
 			@group = group
 			@logger = logger
