@@ -84,6 +84,20 @@ module Build
 		def dependency_node_for(dependency)
 			DependencyNode.new(@chain, dependency, @environment, @arguments)
 		end
+		
+		def print_dependencies(buffer = $stderr, level = 0)
+			self.provisions.each do |provision|
+				buffer.puts "#{" " * indentation}building #{provision.provider.name} which #{provision} which depends on:"
+				
+				provision.each_dependency do |nested_dependency|
+					child = self.dependency_node_for(nested_dependency)
+					
+					child.print_dependencies(buffer, level + 1)
+				end
+			end
+			
+			return nil
+		end
 	end
 	
 	class DependencyTask < Task
