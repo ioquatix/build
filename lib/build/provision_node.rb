@@ -64,6 +64,12 @@ module Build
 		end
 	end
 	
+	module DependenciesFailed
+		def self.to_s
+			"Failed to build all dependencies!"
+		end
+	end
+	
 	class ProvisionTask < Task
 		def initialize(*arguments, **options)
 			super
@@ -92,7 +98,7 @@ module Build
 			if wait_for_children?
 				update_environments!
 			else
-				fail!(ChildrenFailed)
+				fail!(DependenciesFailed)
 			end
 		end
 		
