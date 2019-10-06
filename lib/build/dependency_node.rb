@@ -108,11 +108,13 @@ module Build
 			end
 		end
 		
+		private
+		
 		def update_environments!
 			@provisions.each do |task|
 				if dependency.alias?
 					@environments.concat(task.public_environments)
-				elsif dependency.public?
+				else
 					@environments << task.output_environment
 				end
 			end

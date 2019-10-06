@@ -96,8 +96,6 @@ module Build
 			end
 		end
 		
-		private
-		
 		def local_environment
 			Build::Environment.combine(@node.environment, *@environments)&.evaluate(name: @node.name)
 		end
@@ -105,6 +103,8 @@ module Build
 		def output_environment
 			@build_task.output_environment.dup(parent: nil)
 		end
+		
+		private
 		
 		def update_environments!
 			@dependencies.each do |task|
