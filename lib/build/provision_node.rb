@@ -20,13 +20,13 @@
 
 require 'build/graph'
 
-require_relative 'provision_node'
+require_relative 'build_node'
 
 module Build
-	class DependencyNode < Graph::Node
-		def initialize(chain, dependency, environment, arguments)
+	class ProvisionNode < Graph::Node
+		def initialize(chain, provision, environment, arguments)
 			@chain = chain
-			@dependency = dependency
+			@provision = provision
 			@environment = environment
 			@arguments = arguments
 			
@@ -35,70 +35,58 @@ module Build
 		end
 		
 		attr :chain
-		attr :dependency
+		attr :provision
 		attr :environment
 		attr :arguments
 		
 		def == other
 			super and
 				@chain == other.chain and
-				@dependency == other.dependency and
+				@provision == other.provision and
 				@environment == other.environment and
 				@arguments == other.arguments
 		end
 		
 		def hash
-			super ^ @chain.hash ^ @dependency.hash ^ @environment.hash ^ @arguments.hash
+			super ^ @chain.hash ^ @provision.hash ^ @environment.hash ^ @arguments.hash
 		end
 		
 		def task_class(parent_task)
-			DependencyTask
+			ProvisionTask
 		end
 		
 		def name
-			@dependency.name
+			@provision.name
 		end
 		
-		def provisions
-			@chain.resolved[@dependency]
-		end
-		
-		def public?
-			@dependency.public?
-		end
-		
-		def provision_node_for(provision)
-			ProvisionNode.new(@chain, provision, @environment, @arguments)
+		def dependency_node_for(dependency)
+			DependencyNode.new(@chain, dependency, @environment, @arguments)
 		end
 	end
 	
-	class DependencyTask < Task
+	class ProvisionTask < Task
 		def initialize(*arguments, **options)
 			super
 			
+			@dependencies = []
+			
 			@environments = []
-			@provisions = []
+			@public_environments = []
+			
+			@build_task = nil
 		end
 		
-		attr :environment
+		attr :environments
 		
-		def dependency
-			@node.dependency
+		attr :build_task
+		
+		def provision
+			@node.provision
 		end
 		
 		def update
-			logger.debug(self) do |buffer|
-				buffer.puts "building #{@node} which #{@node.dependency}"
-				@node.provisions.each do |provision|
-					buffer.puts "\tbuilding #{provision.provider.name} which #{provision}"
-				end
-			end
-			
-			# Lookup what things this dependency provides:
-			@node.provisions.each do |provision|
-				@provisions << invoke(
-					@node.provision_node_for(provision)
-				)
+			provision.each_dependency do |dependency|
+				@dependencies << invoke(@node.dependency_node_for(dependency))
 			end
 			
 			if wait_for_children?
@@ -108,16 +96,30 @@ module Build
 			end
 		end
 		
+		private
+		
+		def local_environment
+			Build::Environment.combine(@node.environment, *@environments)&.evaluate(name: @node.name)
+		end
+		
+		def output_environment
+			@build_task.output_environment.dup(parent: nil)
+		end
+		
 		def update_environments!
-			@provisions.each do |task|
-				if dependency.alias?
-					@environments.concat(task.public_environments)
-				elsif dependency.public?
-					@environments << task.output_environment
+			@dependencies.each do |task|
+				if environment = task.environment
+					@environments << environment
+				end
+				
+				if task.dependency.public?
+					@public_environments << environment
 				end
 			end
 			
-			@environment = Build::Environment.combine(*@environments)
+			@build_task = invoke(
+				BuildNode.new(local_environment, @node.provision, @node.arguments)
+			)
 		end
 	end
 end

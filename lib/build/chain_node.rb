@@ -66,9 +66,9 @@ module Build
 		def apply!(task)
 			# Go through all the dependencies in order and apply them to the build graph:
 			@chain.dependencies.each do |dependency|
-				node = DependencyNode.new(@chain, dependency, @environment, @arguments)
-				
-				task.invoke(node)
+				task.invoke(
+					DependencyNode.new(@chain, dependency, @environment, @arguments)
+				)
 			end
 		end
 		
