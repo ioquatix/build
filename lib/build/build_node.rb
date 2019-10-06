@@ -25,9 +25,8 @@ require 'console/event/spawn'
 
 module Build
 	class BuildNode < Graph::Node
-		def initialize(environment, dependency, provisions, arguments)
+		def initialize(environment, provisions, arguments)
 			@environment = environment
-			@dependency = dependency
 			@provisions = provisions
 			@arguments = arguments
 			
@@ -35,20 +34,18 @@ module Build
 		end
 		
 		attr :environment
-		attr :dependency
 		attr :provisions
 		attr :arguments
 		
 		def == other
 			super and
 				@environment == other.environment and
-				@dependency == other.dependency and
 				@provisions == other.provisions and
 				@arguments == other.arguments
 		end
 		
 		def hash
-			super ^ @environment.hash ^ @dependency.hash ^ @provisions.hash ^ @arguments.hash
+			super ^ @environment.hash ^ @provisions.hash ^ @arguments.hash
 		end
 		
 		def task_class(parent_task)
@@ -56,11 +53,11 @@ module Build
 		end
 		
 		def initial_environment
-			Build::Environment.new(@environment, name: @dependency.name)
+			Build::Environment.new(@environment)
 		end
 		
 		def name
-			@dependency.name
+			@environment.name
 		end
 		
 		def apply!(task)

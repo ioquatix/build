@@ -155,12 +155,12 @@ module Build
 				# 	logger.debug {"Using #{environment}"}
 				# end
 				
-				local_environment = Build::Environment.combine(*environments)&.evaluate || Build::Environment.new
+				local_environment = Build::Environment.combine(*environments)&.evaluate(name: dependency.name) || Build::Environment.new(name: dependency.name)
 				
 				# logger.debug("Local Environment: #{local_environment}")
 				
 				build_task = invoke(
-					BuildNode.new(local_environment, dependency, @node.provisions, @node.arguments)
+					BuildNode.new(local_environment, @node.provisions, @node.arguments)
 				)
 				
 				if wait_for_children?
