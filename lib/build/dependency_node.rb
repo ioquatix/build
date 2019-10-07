@@ -82,8 +82,10 @@ module Build
 		def initialize(*arguments, **options)
 			super
 			
-			@environments = []
 			@provisions = []
+			
+			@environments = nil
+			@environment = nil
 		end
 		
 		attr :environment
@@ -117,13 +119,7 @@ module Build
 		private
 		
 		def update_environments!
-			@provisions.each do |task|
-				if dependency.alias?
-					@environments.concat(task.public_environments)
-				else
-					@environments << task.output_environment
-				end
-			end
+			@environments = @provisions.flat_map(&:output_environments)
 			
 			@environment = Build::Environment.combine(*@environments)
 		end

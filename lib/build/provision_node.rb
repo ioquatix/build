@@ -83,6 +83,7 @@ module Build
 		end
 		
 		attr :environments
+		attr :public_environments
 		
 		attr :build_task
 		
@@ -103,11 +104,23 @@ module Build
 		end
 		
 		def local_environment
-			Build::Environment.combine(@node.environment, *@environments)&.evaluate(name: @node.name)
+			Build::Environment.combine(@node.environment, *@environments)&.evaluate(name: @node.name).freeze
 		end
 		
 		def output_environment
-			@build_task.output_environment.dup(parent: nil)
+			if @build_task
+				@build_task.output_environment.dup(parent: nil)
+			end
+		end
+		
+		def output_environments
+			environments = @public_environments.dup
+			
+			if environment = self.output_environment
+				environments << environment
+			end
+			
+			return environments
 		end
 		
 		private
@@ -116,16 +129,18 @@ module Build
 			@dependencies.each do |task|
 				if environment = task.environment
 					@environments << environment
-				end
-				
-				if task.dependency.public?
-					@public_environments << environment
+					
+					if task.dependency.public? || @node.provision.alias?
+						@public_environments << environment
+					end
 				end
 			end
 			
-			@build_task = invoke(
-				BuildNode.new(local_environment, @node.provision, @node.arguments)
-			)
+			unless @node.provision.alias?
+				@build_task = invoke(
+					BuildNode.new(local_environment, @node.provision, @node.arguments)
+				)
+			end
 		end
 	end
 end
