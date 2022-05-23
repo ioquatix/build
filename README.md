@@ -2,23 +2,21 @@
 
 Build is a ruby gem providing systems for building task driven build systems similar to make.
 
-[![Build Status](https://secure.travis-ci.org/ioquatix/build.svg)](http://travis-ci.org/ioquatix/build)
-[![Code Climate](https://codeclimate.com/github/ioquatix/build.svg)](https://codeclimate.com/github/ioquatix/build)
-[![Coverage Status](https://coveralls.io/repos/ioquatix/build/badge.svg)](https://coveralls.io/r/ioquatix/build)
+[![Development Status](https://github.com/ioquatix/build/workflows/Development/badge.svg)](https://github.com/ioquatix/build/actions?workflow=Development)
 
 ## Installation
 
 Add this line to your application's Gemfile:
 
-	gem 'build'
+    gem 'build'
 
 And then execute:
 
-	$ bundle
+    $ bundle
 
 Or install it yourself as:
 
-	$ gem install build
+    $ gem install build
 
 ## Usage
 
@@ -26,11 +24,11 @@ This gem is a container for `build-files` and `build-graph`.
 
 ## Contributing
 
-1. Fork it
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
+1.  Fork it
+2.  Create your feature branch (`git checkout -b my-new-feature`)
+3.  Commit your changes (`git commit -am 'Add some feature'`)
+4.  Push to the branch (`git push origin my-new-feature`)
+5.  Create new Pull Request
 
 ## License
 
