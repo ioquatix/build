@@ -99,10 +99,10 @@ module Build
 			@node.dirty?
 		end
 		
-		def spawn(*arguments)
+		def spawn(*arguments, **options)
 			if wet?
-				@logger&.info(self) {Console::Event::Spawn.for(*arguments)}
-				status = @group.spawn(*arguments)
+				@logger&.info(self) {Console::Event::Spawn.for(*arguments, **options)}
+				status = @group.spawn(*arguments, **options)
 				
 				if status != 0
 					raise CommandFailure.new(self, arguments, status)
@@ -114,8 +114,8 @@ module Build
 			@shell_environment ||= environment.flatten.export
 		end
 		
-		def run!(*arguments)
-			self.spawn(shell_environment, *arguments)
+		def run!(*arguments, **options)
+			self.spawn(shell_environment, *arguments, **options)
 		end
 		
 		def touch(path)
