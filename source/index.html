@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		
+			<title>Overview</title>
+		
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+		
+		<link rel="icon" type="image/png" href="../_static/icon.png"/>
+		<link rel="stylesheet" href="../_static/site.css" type="text/css" media="screen"/>
+		
+		<script src="../_components/jquery/jquery.min.js"></script>
+		<script src="../_components/jquery-syntax/jquery.syntax.min.js"></script>
+		<script src="../_components/mermaid/mermaid.min.js"></script>
+		
+		<script src="../_static/links.js"></script>
+		
+		<script type="text/javascript">
+		//<![CDATA[
+			jQuery(function($) {
+				$.syntax();
+			});
+			
+			let isDarkMode = window.matchMedia("(prefers-color-scheme: dark)").matches
+			let config = {theme: 'light'};
+			if (isDarkMode) config.theme = 'dark';
+			else config.theme = 'forest';
+			mermaid.initialize(config);
+		//]]>
+		</script>
+	</head>
+
+	<body>
+		<header> › <a class="link" href="../index.html">Project</a> › <a class="link" href="index.html">Source</a></header>
+		
+		<main>
+			
+	<h1>Overview</h1>
+	
+	<ul class="index"><li>
+						<a href="Build/index.html"><code class="language-ruby">module Build</code></a>
+						
+						
+						
+					
+					<ul class="index"><li>
+						<a href="Build/BuildNode/index.html"><code class="language-ruby">class BuildNode</code></a>
+						
+						
+						
+					
+					<ul class="index"></ul>				</li><li>
+						<a href="Build/BuildTask/index.html"><code class="language-ruby">class BuildTask</code></a>
+						
+						
+						
+							<p>This task class serves as the base class for the environment specific task classes genearted when adding targets.</p>
+
+					
+					<ul class="index"><li>
+						<a href="Build/BuildTask/CommandFailure/index.html"><code class="language-ruby">class CommandFailure</code></a>
+						
+						
+						
+					
+					<ul class="index"></ul>				</li></ul>				</li><li>
+						<a href="Build/ChainNode/index.html"><code class="language-ruby">class ChainNode</code></a>
+						
+						
+						
+							<p>Responsible for processing a chain into a series of dependency nodes.</p>
+
+					
+					<ul class="index"><li>
+					
+									</li><li>
+					
+									</li></ul>				</li><li>
+						<a href="Build/Controller/index.html"><code class="language-ruby">class Controller</code></a>
+						
+						
+						
+					
+					<ul class="index"><li>
+					
+									</li><li>
+					
+									</li></ul>				</li><li>
+						<a href="Build/DependencyNode/index.html"><code class="language-ruby">class DependencyNode</code></a>
+						
+						
+						
+					
+					<ul class="index"></ul>				</li><li>
+						<a href="Build/ProvisionsFailed/index.html"><code class="language-ruby">module ProvisionsFailed</code></a>
+						
+						
+						
+					
+					<ul class="index"></ul>				</li><li>
+						<a href="Build/DependencyTask/index.html"><code class="language-ruby">class DependencyTask</code></a>
+						
+						
+						
+					
+					<ul class="index"></ul>				</li><li>
+						<a href="Build/Name/index.html"><code class="language-ruby">class Name</code></a>
+						
+						
+						
+					
+					<ul class="index"><li>
+					
+									</li><li>
+					
+									</li><li>
+					
+									</li><li>
+					
+									</li><li>
+					
+									</li></ul>				</li><li>
+						<a href="Build/ProvisionNode/index.html"><code class="language-ruby">class ProvisionNode</code></a>
+						
+						
+						
+					
+					<ul class="index"></ul>				</li><li>
+						<a href="Build/DependenciesFailed/index.html"><code class="language-ruby">module DependenciesFailed</code></a>
+						
+						
+						
+					
+					<ul class="index"></ul>				</li><li>
+						<a href="Build/ProvisionTask/index.html"><code class="language-ruby">class ProvisionTask</code></a>
+						
+						
+						
+					
+					<ul class="index"></ul>				</li><li>
+						<a href="Build/Rule/index.html"><code class="language-ruby">class Rule</code></a>
+						
+						
+						
+							<p>A rule is a function with a specific set of input and output parameters, which can match against a given set of specific arguments. For example, there might be several rules for compiling, but the specific rules depend on the language being compiled.</p>
+
+					
+					<ul class="index"><li>
+						<a href="Build/Rule/Parameter/index.html"><code class="language-ruby">class Parameter</code></a>
+						
+						
+						
+					
+					<ul class="index"><li>
+					
+									</li><li>
+					
+									</li><li>
+					
+									</li></ul>				</li><li>
+					
+									</li><li>
+					
+									</li><li>
+					
+									</li><li>
+					
+									</li><li>
+					
+									</li></ul>				</li><li>
+						<a href="Build/NoApplicableRule/index.html"><code class="language-ruby">class NoApplicableRule</code></a>
+						
+						
+						
+					
+					<ul class="index"></ul>				</li><li>
+						<a href="Build/RuleNode/index.html"><code class="language-ruby">class RuleNode</code></a>
+						
+						
+						
+					
+					<ul class="index"></ul>				</li><li>
+						<a href="Build/Rulebook/index.html"><code class="language-ruby">class Rulebook</code></a>
+						
+						
+						
+					
+					<ul class="index"></ul>				</li><li>
+						<a href="Build/Task/index.html"><code class="language-ruby">class Task</code></a>
+						
+						
+						
+							<p>This task class serves as the base class for the environment specific task classes genearted when adding targets.</p>
+
+					
+					<ul class="index"></ul>				</li></ul>				</li></ul>
+				
+			<footer>Documentation generated by <a href="https://github.com/socketry/utopia-project">Utopia::Project</a>.</footer>
+		</main>
+	</body>
+</html>
