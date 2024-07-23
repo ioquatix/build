@@ -121,21 +121,21 @@ module Build
 		def touch(path)
 			return unless wet?
 			
-			@logger&.info(self) {Console::Shell.for('touch', path)}
+			Console::Event::Spawn.for('touch', path).emit(self)
 			FileUtils.touch(path)
 		end
 		
 		def cp(source_path, destination_path)
 			return unless wet?
 			
-			@logger&.info(self) {Console::Shell.for('cp', source_path, destination_path)}
+			Console::Event::Spawn.for('cp', source_path, destination_path).emit(self)
 			FileUtils.copy(source_path, destination_path)
 		end
 		
 		def rm(path)
 			return unless wet?
 			
-			@logger&.info(self) {Console::Shell.for('rm -rf', path)}
+			Console::Event::Spawn.for('rm', '-rf', path).emit(self)
 			FileUtils.rm_rf(path)
 		end
 		
@@ -143,7 +143,7 @@ module Build
 			return unless wet?
 			
 			unless File.exist?(path)
-				@logger&.info(self) {Console::Shell.for('mkpath', path)}
+				Console::Event::Spawn.for('mkdir', '-p', path).emit(self)
 				FileUtils.mkpath(path)
 			end
 		end
@@ -151,14 +151,14 @@ module Build
 		def install(source_path, destination_path)
 			return unless wet?
 			
-			@logger&.info(self) {Console::Shell.for('install', source_path, destination_path)}
+			Console::Event::Spawn.for('install', source_path, destination_path).emit(self)
 			FileUtils.install(source_path, destination_path)
 		end
 		
 		def write(path, data, mode = "w")
 			return unless wet?
 			
-			@logger&.info(self) {Console::Shell.for("write", path, "#{data.size}bytes")}
+			Console::Event::Spawn.for('write', path).emit(self, size: data.size)
 			File.open(path, mode) do |file|
 				file.write(data)
 			end
