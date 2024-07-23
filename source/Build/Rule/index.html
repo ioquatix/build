@@ -17,7 +17,7 @@
 		<script src="../../../_static/links.js"></script>
 		
 		<script type="text/javascript">
-		//<![CDATA[
+		//
 			jQuery(function($) {
 				$.syntax();
 			});
@@ -27,37 +27,34 @@
 			if (isDarkMode) config.theme = 'dark';
 			else config.theme = 'forest';
 			mermaid.initialize(config);
-		//]]>
+		//
 		</script>
 	</head>
 
 	<body>
-		<header> › <a class="link" href="../../../index.html">Project</a> › <a class="link" href="../../index.html">Source</a></header>
+		<header> › <a class="link" href="../../../index.html">Build
+</a> › <a class="link" href="../../index.html">Source</a> › <a href="../index.html">Build</a>  › <a href="index.html">Rule</a> </header>
 		
 		<main>
 			
-	<h1>Build::Rule</h1>
-	
-	<p>
-		<code class="language-ruby">class Build::Rule</code>
-	</p>
+
+	<h1>
+		<code class="language-ruby">class Rule</code>
+	</h1>
 	
 	<p>A rule is a function with a specific set of input and output parameters, which can match against a given set of specific arguments. For example, there might be several rules for compiling, but the specific rules depend on the language being compiled.</p>
 	
-	
-	
 	<section>
-	<h2>Nested</h2>
-	
-	<ul>
-		<li><a href="Parameter/index.html"><code class="language-ruby">Build::Rule::Parameter</code></a></li>
-	</ul>
+		<h2>Nested</h2>
+		
+		<ul>
+			<li><a href="Parameter/index.html"><code class="language-ruby">::Parameter</code></a></li>
+		</ul>
 	</section>
-	
 	<section>
-	<h2>Definitions</h2>
-	
-	<section id="Build::Rule#name"><h3><code class="language-ruby">attr :name</code></h3><p>compile.cpp</p>
+		<h2>Definitions</h2>
+		
+		<section id="Build::Rule#name"><h3><code class="language-ruby">attr :name</code></h3><p>compile.cpp</p>
 </section><section id="Build::Rule#process_name"><h3><code class="language-ruby">attr :process_name</code></h3><p>compile</p>
 </section><section id="Build::Rule#full_name"><h3><code class="language-ruby">attr :full_name</code></h3><p>compile_cpp</p>
 </section><section id="Build::Rule#applicable?"><h3><code class="language-ruby">def applicable?(arguments)</code></h3><p>Check if this rule can process these parameters</p>
@@ -83,7 +80,6 @@ end</code></pre>
 	]
 end</code></pre>
 					</details></section>	</section>
-	
 	
 
 				

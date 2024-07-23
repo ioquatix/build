@@ -17,7 +17,7 @@
 		<script src="../../../../_static/links.js"></script>
 		
 		<script type="text/javascript">
-		//<![CDATA[
+		//
 			jQuery(function($) {
 				$.syntax();
 			});
@@ -27,29 +27,26 @@
 			if (isDarkMode) config.theme = 'dark';
 			else config.theme = 'forest';
 			mermaid.initialize(config);
-		//]]>
+		//
 		</script>
 	</head>
 
 	<body>
-		<header> › <a class="link" href="../../../../index.html">Project</a> › <a class="link" href="../../../index.html">Source</a></header>
+		<header> › <a class="link" href="../../../../index.html">Build
+</a> › <a class="link" href="../../../index.html">Source</a> › <a href="../../index.html">Build</a>  › <a href="../index.html">Rule</a>  › <a href="index.html">Parameter</a> </header>
 		
 		<main>
 			
-	<h1>Build::Rule::Parameter</h1>
-	
-	<p>
-		<code class="language-ruby">class Build::Rule::Parameter</code>
-	</p>
+
+	<h1>
+		<code class="language-ruby">class Parameter</code>
+	</h1>
 	
 		
-	
-	
-	
 	<section>
-	<h2>Definitions</h2>
-	
-	<section id="Build::Rule::Parameter#default?"><h3><code class="language-ruby">def default?</code></h3><p>Do we have a default value for this parameter?</p>
+		<h2>Definitions</h2>
+		
+		<section id="Build::Rule::Parameter#default?"><h3><code class="language-ruby">def default?</code></h3><p>Do we have a default value for this parameter?</p>
 <details>
 						<summary><h4>Implementation</h4></summary>
 						<pre><code class="language-ruby">def default?
@@ -68,7 +65,6 @@ end</code></pre>
 	other.kind_of?(self.class) and @direction.eql?(other.direction) and @name.eql?(other.name) and @options.eql?(other.options) # and @dynamic == other.dynamic
 end</code></pre>
 					</details></section>	</section>
-	
 	
 
 				
