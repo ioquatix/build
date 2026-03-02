@@ -12,9 +12,9 @@ require_relative "dependency_node"
 module Build
 	# Responsible for processing a chain into a series of dependency nodes.
 	class ChainNode < Graph::Node
-		# @param chain [Chain] the chain to build.
-		# @param arguments [Array] the arguments to pass to the output environment constructor.
-		# @param anvironment [Build::Environment] the root environment to prepend into the chain.
+		# @parameter chain [Chain] the chain to build.
+		# @parameter arguments [Array] the arguments to pass to the output environment constructor.
+		# @parameter environment [Build::Environment] the root environment to prepend into the chain.
 		def initialize(chain, arguments, environment)
 			@chain = chain
 			@arguments = arguments
@@ -28,6 +28,7 @@ module Build
 		attr :arguments
 		attr :environment
 		
+		# @returns [Boolean] Whether this node is equal to another.
 		def == other
 			super and
 				@chain == other.chain and
@@ -35,14 +36,17 @@ module Build
 				@environment == other.environment
 		end
 		
+		# @returns [Integer] A hash value for this node.
 		def hash
 			super ^ @chain.hash ^ @arguments.hash ^ @environment.hash
 		end
 		
+		# @returns [Class] The task class to use for this node.
 		def task_class(parent_task)
 			Task
 		end
 		
+		# @returns [String] The name of the environment.
 		def name
 			@environment.name
 		end
@@ -57,6 +61,7 @@ module Build
 			end
 		end
 		
+		# @returns [String] A human-readable representation of this node.
 		def inspect
 			"#<#{self.class} #{@environment.inspect}>"
 		end

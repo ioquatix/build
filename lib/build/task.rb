@@ -11,28 +11,34 @@ require "console/event/spawn"
 module Build
 	# This task class serves as the base class for the environment specific task classes genearted when adding targets.
 	class Task < Graph::Task
-		def initialize(walker, node, group, logger: nil)
+		# Initialize the task.
+		# @parameter walker [Build::Graph::Walker] The graph walker.
+		# @parameter node [Build::Graph::Node] The node being processed.
+		# @parameter group [Process::Group] The process group for spawning commands.
+		def initialize(walker, node, group)
 			super(walker, node)
 			
 			@group = group
-			@logger = logger
 		end
 		
+		# @returns [Class] The class of this task.
 		def task_class
 			self.class
 		end
 		
 		attr :group
-		attr :logger
 		
+		# Apply the node to this task, executing any build logic.
 		def update
 			@node.apply!(self)
 		end
 		
+		# @returns [String] A string representation of the task.
 		def name
 			self.to_s
 		end
 		
+		# @returns [String] The name of the underlying node.
 		def node_string
 			@node.name
 		end

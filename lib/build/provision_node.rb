@@ -8,7 +8,13 @@ require "build/graph"
 require_relative "build_node"
 
 module Build
+	# Represents a build graph node for applying a single provision within a dependency chain.
 	class ProvisionNode < Graph::Node
+		# Initialize the provision node.
+		# @parameter chain [Build::Dependency::Chain] The dependency chain.
+		# @parameter provision [Build::Dependency::Provision] The provision to apply.
+		# @parameter environment [Build::Environment] The root environment.
+		# @parameter arguments [Array] Arguments passed down the build chain.
 		def initialize(chain, provision, environment, arguments)
 			@chain = chain
 			@provision = provision
@@ -24,6 +30,7 @@ module Build
 		attr :environment
 		attr :arguments
 		
+		# @returns [Boolean] Whether this node is equal to another.
 		def == other
 			super and
 				@chain == other.chain and
@@ -32,30 +39,40 @@ module Build
 				@arguments == other.arguments
 		end
 		
+		# @returns [Integer] A hash value for this node.
 		def hash
 			super ^ @chain.hash ^ @provision.hash ^ @environment.hash ^ @arguments.hash
 		end
 		
+		# @returns [Class] The task class to use for this node.
 		def task_class(parent_task)
 			ProvisionTask
 		end
 		
+		# @returns [String] The name of the provision.
 		def name
 			@provision.name
 		end
 		
+		# Build a {DependencyNode} for the given dependency.
+		# @parameter dependency [Build::Dependency] The dependency to wrap.
+		# @returns [Build::DependencyNode] The corresponding dependency node.
 		def dependency_node_for(dependency)
 			DependencyNode.new(@chain, dependency, @environment, @arguments)
 		end
 	end
 	
+	# @namespace
 	module DependenciesFailed
+		# @returns [String] A description of the failure.
 		def self.to_s
 			"Failed to build all dependencies!"
 		end
 	end
 	
+	# Represents a task that builds the dependencies of a provision and applies the provision itself.
 	class ProvisionTask < Task
+		# Initialize the provision task.
 		def initialize(*arguments, **options)
 			super
 			
@@ -72,10 +89,12 @@ module Build
 		
 		attr :build_task
 		
+		# @returns [Build::Dependency::Provision] The provision being built by this task.
 		def provision
 			@node.provision
 		end
 		
+		# Build all dependencies and then apply the provision.
 		def update
 			provision.each_dependency do |dependency|
 				@dependencies << invoke(@node.dependency_node_for(dependency))
@@ -88,16 +107,19 @@ module Build
 			end
 		end
 		
+		# @returns [Build::Environment] The combined local environment for this provision.
 		def local_environment
 			Build::Environment.combine(@node.environment, *@environments)&.evaluate(name: @node.name).freeze
 		end
 		
+		# @returns [Build::Environment | Nil] The output environment produced by the build task, if any.
 		def output_environment
 			if @build_task
 				@build_task.output_environment.dup(parent: nil)
 			end
 		end
 		
+		# @returns [Array(Build::Environment)] All output environments including any public ones.
 		def output_environments
 			environments = @public_environments.dup
 			

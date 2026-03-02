@@ -6,7 +6,10 @@
 require_relative "rule"
 
 module Build
+	# Represents a collection of rules, organized by process name for fast lookup.
 	class Rulebook
+		# Initialize the rulebook.
+		# @parameter name [String | Nil] An optional name for this rulebook.
 		def initialize(name = nil)
 			@name = name
 			@rules = {}
@@ -15,6 +18,8 @@ module Build
 		
 		attr :rules
 		
+		# Add a rule to this rulebook.
+		# @parameter rule [Build::Rule] The rule to add.
 		def << rule
 			@rules[rule.name] = rule
 			
@@ -23,10 +28,17 @@ module Build
 			processes << rule
 		end
 		
+		# Look up a rule by its full name.
+		# @parameter name [String] The rule name, e.g. `"compile.cpp"`.
+		# @returns [Build::Rule | Nil] The matching rule, or `nil`.
 		def [] name
 			@rules[name]
 		end
 		
+		# Generate a task subclass with methods for all rules in this rulebook.
+		# @parameter superclass [Class] The base task class to inherit from.
+		# @parameter state [Hash] Additional state methods to define on the subclass.
+		# @returns [Class] The generated task subclass.
 		def with(superclass, **state)
 			task_class = Class.new(superclass)
 			
@@ -66,6 +78,9 @@ module Build
 			return task_class
 		end
 		
+		# Build a rulebook from all rule definitions in the given environment.
+		# @parameter environment [Build::Environment] The environment to extract rules from.
+		# @returns [Build::Rulebook] The populated rulebook.
 		def self.for(environment)
 			rulebook = self.new(environment.name)
 			

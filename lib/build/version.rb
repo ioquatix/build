@@ -3,6 +3,7 @@
 # Released under the MIT License.
 # Copyright, 2015-2024, by Samuel Williams.
 
+# @namespace
 module Build
 	VERSION = "2.6.2"
 end

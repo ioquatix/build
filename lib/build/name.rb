@@ -4,7 +4,10 @@
 # Copyright, 2015-2019, by Samuel Williams.
 
 module Build
+	# Represents a human-readable name with helpers for generating identifiers, target names, and macros.
 	class Name
+		# Initialize the name with the given text.
+		# @parameter text [String] The human-readable name text.
 		def initialize(text)
 			@text = text
 			
@@ -13,6 +16,9 @@ module Build
 			@key = nil
 		end
 		
+		# Construct a {Name} from a hyphen-separated target name string.
+		# @parameter string [String] A target name such as `"foo-bar"`.
+		# @returns [Build::Name] The corresponding name instance.
 		def self.from_target(string)
 			self.new(string.gsub(/(^|[ \-_])(.)/){" " + $2.upcase}.strip)
 		end

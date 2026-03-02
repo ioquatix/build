@@ -4,6 +4,9 @@
 # Copyright, 2015, by Samuel Williams.
 
 module Build
+	# Generate a Graphviz graph visualisation of the build graph.
+	# @parameter walker [Build::Graph::Walker] The completed walker containing tasks.
+	# @returns [Graphviz::Graph] A graph object ready for rendering.
 	def self.graph_visualisation(walker)
 		graph = Graphviz::Graph.new("G", rankdir: "LR")
 		
