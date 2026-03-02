@@ -1,27 +1,12 @@
-# Copyright, 2016, by Samuel G. D. Williams. <http://www.codeotaku.com>
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
+# frozen_string_literal: true
 
-require 'fileutils'
-require 'build/graph'
+# Released under the MIT License.
+# Copyright, 2019-2024, by Samuel Williams.
 
-require 'console/event/spawn'
+require "fileutils"
+require "build/graph"
+
+require "console/event/spawn"
 
 module Build
 	class BuildNode < Graph::Node
@@ -101,7 +86,7 @@ module Build
 		
 		def spawn(*arguments, **options)
 			if wet?
-				@logger&.info(self) {Console::Event::Spawn.for(*arguments, **options)}
+				@logger&.info(self){Console::Event::Spawn.for(*arguments, **options)}
 				status = @group.spawn(*arguments, **options)
 				
 				if status != 0
@@ -121,21 +106,21 @@ module Build
 		def touch(path)
 			return unless wet?
 			
-			Console::Event::Spawn.for('touch', path).emit(self)
+			Console::Event::Spawn.for("touch", path).emit(self)
 			FileUtils.touch(path)
 		end
 		
 		def cp(source_path, destination_path)
 			return unless wet?
 			
-			Console::Event::Spawn.for('cp', source_path, destination_path).emit(self)
+			Console::Event::Spawn.for("cp", source_path, destination_path).emit(self)
 			FileUtils.copy(source_path, destination_path)
 		end
 		
 		def rm(path)
 			return unless wet?
 			
-			Console::Event::Spawn.for('rm', '-rf', path).emit(self)
+			Console::Event::Spawn.for("rm", "-rf", path).emit(self)
 			FileUtils.rm_rf(path)
 		end
 		
@@ -143,7 +128,7 @@ module Build
 			return unless wet?
 			
 			unless File.exist?(path)
-				Console::Event::Spawn.for('mkdir', '-p', path).emit(self)
+				Console::Event::Spawn.for("mkdir", "-p", path).emit(self)
 				FileUtils.mkpath(path)
 			end
 		end
@@ -151,14 +136,14 @@ module Build
 		def install(source_path, destination_path)
 			return unless wet?
 			
-			Console::Event::Spawn.for('install', source_path, destination_path).emit(self)
+			Console::Event::Spawn.for("install", source_path, destination_path).emit(self)
 			FileUtils.install(source_path, destination_path)
 		end
 		
 		def write(path, data, mode = "w")
 			return unless wet?
 			
-			Console::Event::Spawn.for('write', path).emit(self, size: data.size)
+			Console::Event::Spawn.for("write", path).emit(self, size: data.size)
 			File.open(path, mode) do |file|
 				file.write(data)
 			end
@@ -167,13 +152,13 @@ module Build
 		def invoke_rule(rule, arguments, &block)
 			arguments = rule.normalize(arguments, self)
 			
-			@logger&.debug(self) {"-> #{rule}(#{arguments.inspect})"}
+			@logger&.debug(self){"-> #{rule}(#{arguments.inspect})"}
 			
 			invoke(
 				RuleNode.new(rule, arguments, &block)
 			)
 			
-			@logger&.debug(self) {"<- #{rule}(...) -> #{rule.result(arguments)}"}
+			@logger&.debug(self){"<- #{rule}(...) -> #{rule.result(arguments)}"}
 			
 			return rule.result(arguments)
 		end

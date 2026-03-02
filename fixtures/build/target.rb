@@ -1,5 +1,9 @@
+# frozen_string_literal: true
 
-require 'build/dependency'
+# Released under the MIT License.
+# Copyright, 2019, by Samuel Williams.
+
+require "build/dependency"
 
 class Target
 	include Build::Dependency

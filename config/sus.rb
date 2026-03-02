@@ -3,6 +3,5 @@
 # Released under the MIT License.
 # Copyright, 2015-2024, by Samuel Williams.
 
-module Build
-	VERSION = "2.6.2"
-end
+require "covered/sus"
+include Covered::Sus
