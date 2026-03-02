@@ -1,3 +1,3 @@
 # Releases
 
-## Unreleased
+## v2.7.0

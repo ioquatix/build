@@ -20,11 +20,13 @@ Or install it yourself as:
 
 ## Usage
 
-This gem is a container for `build-files` and `build-graph`.
+Please see the [project documentation](https://ioquatix.github.io/build) for more details.
 
 ## Releases
 
-There are no documented releases.
+Please see the [project releases](https://ioquatix.github.io/buildreleases/index) for all releases.
+
+### v2.7.0
 
 ## Contributing
 
