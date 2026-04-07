@@ -27,5 +27,4 @@ Gem::Specification.new do |spec|
 	spec.add_dependency "build-environment", "~> 1.12"
 	spec.add_dependency "build-graph", "~> 2.1"
 	spec.add_dependency "build-makefile", "~> 1.0"
-	spec.add_dependency "graphviz", "~> 1.0"
 end
