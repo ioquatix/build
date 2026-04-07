@@ -1,0 +1,13 @@
+# Automatically generated context index for Utopia::Project guides.
+# Do not edit then files in this directory directly, instead edit the guides and then run `bake utopia:project:agent:context:update`.
+---
+description: Build is a framework for creating task based build systems.
+metadata:
+  documentation_uri: https://ioquatix.github.io/build/
+  source_code_uri: https://github.com/kurocha/build.git
+  funding_uri: https://github.com/sponsors/ioquatix
+files:
+- path: getting-started.md
+  title: Getting Started
+  description: This guide explains how to get started with `build`, a task-driven
+    build system similar to make.

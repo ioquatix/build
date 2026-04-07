@@ -4,23 +4,11 @@ Build is a ruby gem providing systems for building task driven build systems sim
 
 [![Development Status](https://github.com/ioquatix/build/workflows/Test/badge.svg)](https://github.com/ioquatix/build/actions?workflow=Test)
 
-## Installation
-
-Add this line to your application's Gemfile:
-
-    gem 'build'
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install build
-
 ## Usage
 
 Please see the [project documentation](https://ioquatix.github.io/build/) for more details.
+
+  - [Getting Started](https://ioquatix.github.io/build/guides/getting-started/index) - This guide explains how to get started with `build`, a task-driven build system similar to make.
 
 ## Releases
 
