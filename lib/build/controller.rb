@@ -48,8 +48,6 @@ module Build
 		# Initialize the controller, yielding self to allow adding chain nodes.
 		# @parameter limit [Integer | Nil] Maximum number of concurrent processes.
 		def initialize(nodes = [], limit: nil)
-			@module = Module.new
-			
 			if block_given?
 				warn "Passing a block to Build::Controller.new is deprecated, use Build::Controller.build instead."
 				
