@@ -47,26 +47,16 @@ module Build
 		
 		# Initialize the controller, yielding self to allow adding chain nodes.
 		# @parameter limit [Integer | Nil] Maximum number of concurrent processes.
-		def initialize(nodes = [], limit: nil)
-			if block_given?
-				warn "Passing a block to Build::Controller.new is deprecated, use Build::Controller.build instead."
-				
-				builder = Builder.new
-				yield builder
-				@nodes = builder.nodes.freeze
-			else
-				@nodes = nodes.freeze
-			end
-			
-			@group = Process::Group.new(limit: limit)
-			
-			# The task class is captured as we traverse all the top level targets:
-			@task_class = nil
-			
-			@walker = Graph::Walker.new(&self.method(:step))
+		def initialize(nodes = [], limit: nil, group: nil, walker: nil)
+			@nodes = nodes.freeze
+			@group = group || Process::Group.new(limit: limit)
+			@walker = walker || Graph::Walker.new(&self.method(:step))
 		end
 		
+		# @attribute [Array(Graph::Node)] The list of nodes to build.
 		attr :nodes
+		
+		# @attribute [Graph::Walker] The graph walker used to traverse the build graph.
 		attr :walker
 		
 		# Visit a task, executing its update method within the context of the task's visit method.

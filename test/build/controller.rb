@@ -42,8 +42,8 @@ describe Build::Controller do
 		it "build graph should fail" do
 			chain = Build::Dependency::Chain.expand(["foo"], [make_target, build_target])
 			
-			controller = Build::Controller.new do |controller|
-				controller.add_chain(chain, [], base)
+			controller = Build::Controller.build do |builder|
+				builder.add_chain(chain, [], base)
 			end
 			
 			controller.update
@@ -102,8 +102,8 @@ describe Build::Controller do
 		it "should execute the build graph" do
 			chain = Build::Dependency::Chain.expand(["foo"], [files_target, build_target])
 			
-			controller = Build::Controller.new do |controller|
-				controller.add_chain(chain, [], base)
+			controller = Build::Controller.build do |builder|
+				builder.add_chain(chain, [], base)
 			end
 			
 			expect(controller.nodes.size).to be == 1
