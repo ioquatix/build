@@ -20,13 +20,15 @@ Or install it yourself as:
 
 ## Usage
 
-Please see the [project documentation](https://ioquatix.github.io/build) for more details.
+Please see the [project documentation](https://ioquatix.github.io/build/) for more details.
 
 ## Releases
 
-Please see the [project releases](https://ioquatix.github.io/buildreleases/index) for all releases.
+Please see the [project releases](https://ioquatix.github.io/build/releases/index) for all releases.
 
 ### v2.7.0
+
+  - Remove logger dependency and options.
 
 ## Contributing
 
@@ -37,6 +39,22 @@ We welcome contributions to this project.
 3.  Commit your changes (`git commit -am 'Add some feature'`).
 4.  Push to the branch (`git push origin my-new-feature`).
 5.  Create new Pull Request.
+
+### Running Tests
+
+To run the test suite:
+
+``` shell
+bundle exec sus
+```
+
+### Making Releases
+
+To make a new release:
+
+``` shell
+bundle exec bake gem:release:patch # or minor or major
+```
 
 ### Developer Certificate of Origin
 

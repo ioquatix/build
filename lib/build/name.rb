@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Released under the MIT License.
-# Copyright, 2015-2019, by Samuel Williams.
+# Copyright, 2015-2026, by Samuel Williams.
 
 module Build
 	# Represents a human-readable name with helpers for generating identifiers, target names, and macros.

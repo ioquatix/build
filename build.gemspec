@@ -13,17 +13,15 @@ Gem::Specification.new do |spec|
 	spec.cert_chain  = ["release.cert"]
 	spec.signing_key = File.expand_path("~/.gem/release.pem")
 	
-	spec.homepage = "https://github.com/kurocha/build"
-	
 	spec.metadata = {
-		"documentation_uri" => "https://ioquatix.github.io/build",
-		"funding_uri" => "https://github.com/sponsors/ioquatix",
+		"documentation_uri" => "https://ioquatix.github.io/build/",
 		"source_code_uri" => "https://github.com/kurocha/build.git",
+		"funding_uri" => "https://github.com/sponsors/ioquatix",
 	}
 	
 	spec.files = Dir.glob(["{lib}/**/*", "*.md"], File::FNM_DOTMATCH, base: __dir__)
 	
-	spec.required_ruby_version = ">= 3.2"
+	spec.required_ruby_version = ">= 3.3"
 	
 	spec.add_dependency "build-dependency", "~> 1.5"
 	spec.add_dependency "build-environment", "~> 1.12"

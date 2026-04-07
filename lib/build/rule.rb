@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Released under the MIT License.
-# Copyright, 2015-2019, by Samuel Williams.
+# Copyright, 2015-2026, by Samuel Williams.
 
 module Build
 	# A rule is a function with a specific set of input and output parameters, which can match against a given set of specific arguments. For example, there might be several rules for compiling, but the specific rules depend on the language being compiled.
