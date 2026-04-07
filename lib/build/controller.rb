@@ -20,15 +20,45 @@ require "console"
 module Build
 	# Represents the top-level build controller that manages the walker and process group.
 	class Controller
+		# A builder class for constructing the controller.
+		class Builder
+			# Initialize the builder with an empty list of nodes.
+			def initialize
+				@nodes = []
+			end
+			
+			# @attribute [Array(Graph::Node)] The list of nodes to build.
+			attr :nodes
+			
+			# Add a build environment to the controller.
+			def add_chain(chain, arguments = [], environment)
+				@nodes << ChainNode.new(chain, arguments, environment)
+			end
+		end
+		
+		# Create a new controller using a builder.
+		def self.build(**options)
+			builder = Builder.new
+			
+			yield builder
+			
+			new(builder.nodes, **options)
+		end
+		
 		# Initialize the controller, yielding self to allow adding chain nodes.
 		# @parameter limit [Integer | Nil] Maximum number of concurrent processes.
-		def initialize(limit: nil)
+		def initialize(nodes = [], limit: nil)
 			@module = Module.new
 			
-			# Top level nodes, for sanity this is a static list.
-			@nodes = []
-			yield self
-			@nodes.freeze
+			if block_given?
+				warn "Passing a block to Build::Controller.new is deprecated, use Build::Controller.build instead."
+				
+				builder = Builder.new
+				yield builder
+				@nodes = builder.nodes.freeze
+			else
+				@nodes = nodes.freeze
+			end
 			
 			@group = Process::Group.new(limit: limit)
 			
@@ -41,6 +71,15 @@ module Build
 		attr :nodes
 		attr :walker
 		
+		# Visit a task, executing its update method within the context of the task's visit method.
+		#
+		# @parameter task [Build::Task] The task to visit.
+		def visit(task)
+			task.visit do
+				task.update
+			end
+		end
+		
 		# Execute a single step of the build graph for the given node.
 		# @parameter walker [Build::Graph::Walker] The graph walker.
 		# @parameter node [Build::Graph::Node] The node to process.
@@ -49,19 +88,12 @@ module Build
 			task_class = node.task_class(parent_task) || Task
 			task = task_class.new(walker, node, @group)
 			
-			task.visit do
-				task.update
-			end
+			self.visit(task)
 		end
 		
 		# @returns [Boolean] Whether the build has failed.
 		def failed?
 			@walker.failed?
-		end
-		
-		# Add a build environment to the controller.
-		def add_chain(chain, arguments = [], environment)
-			@nodes << ChainNode.new(chain, arguments, environment)
 		end
 		
 		# Execute all top-level nodes, waiting for each to complete.
